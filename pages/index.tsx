@@ -1,11 +1,20 @@
-import Navbar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
-import styles from "@/styles/index.module.scss";
 import { Button, Image } from "react-bootstrap";
+
+import Footer from "@/components/footer/footer";
+import Navbar from "@/components/navbar/navbar";
+import styles from "@/styles/index.module.scss";
+import Head from "next/head";
 
 export default function Home() {
   return (
     <>
+      <Head>
+        <title>Home | Course Horse</title>
+        <meta
+          name="description"
+          content="Your all-in-one online learning platform."
+        />
+      </Head>
       <Navbar />
       <main className="pageContainer">
         <div className={styles.header}>

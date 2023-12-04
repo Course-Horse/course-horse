@@ -15,6 +15,7 @@
     "bootstrap-icons": "^1.11.2",
     "mongodb": "^6.3.0",
     "next": "14.0.3",
+    "next-auth": "^4.24.5",
     "react": "^18",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18"

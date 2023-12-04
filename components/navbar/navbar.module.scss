@@ -1,8 +1,13 @@
+.navbar {
+  border-bottom: 1px solid var(--bs-gray-200);
+}
+
 .navContainer {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   width: 100%;
+
   @media (max-width: 992px) {
     flex-direction: column;
     justify-content: start;

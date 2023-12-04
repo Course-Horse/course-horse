@@ -46,8 +46,6 @@ TBD
 
 ## The Develeopers
 
-- Jack Byrne
-  - jbyrne4@stevens.edu
 - David Cruz
   - da.cruz@aol.com
   - [David's Website](https://xxmistacruzxx.github.io/)
@@ -60,7 +58,7 @@ TBD
 
 ## APIs, Tools, & Libraries Used
 
-GenEdUSA is developed using an assortment of modern Javascript oriented web development tools and frameworks.
+Course Horse is developed using an assortment of modern Javascript oriented web development tools and frameworks.
 
 ### Development Tools
 
