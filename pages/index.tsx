@@ -1,4 +1,5 @@
 import { Button, Image } from "react-bootstrap";
+import { useSession } from "next-auth/react";
 
 import Footer from "@/components/footer/footer";
 import Navbar from "@/components/navbar/navbar";
@@ -6,6 +7,9 @@ import styles from "@/styles/index.module.scss";
 import Head from "next/head";
 
 export default function Home() {
+  const { data: session } = useSession();
+  // console.log("session", session);
+
   return (
     <>
       <Head>
