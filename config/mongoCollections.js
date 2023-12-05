@@ -15,8 +15,8 @@ const getCollectionFn = (collection) => {
   };
 };
 
+const users = getCollectionFn("users");
+const courses = getCollectionFn("courses");
+
 /* Now, you can list your collections here: */
-module.exports = {
-  users: getCollectionFn("users"),
-  courses: getCollectionFn("courses"),
-};
+export { users, courses };

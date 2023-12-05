@@ -6,6 +6,7 @@ import Footer from "@/components/footer/footer";
 
 export default function MyProfile() {
   const { data: session } = useSession();
+  console.log(session);
 
   async function submitHandler(e: any) {
     e.preventDefault();
@@ -19,10 +20,10 @@ export default function MyProfile() {
         <meta name="description" content="View your profile on Course Horse." />
       </Head>
       <NavBar />
-      <main>
+      <main className="pageContainer">
         <h1>My Profile</h1>
-        <p>Username: {session?.user?.email || "N/A"}</p>
-        <button onClick={submitHandler}>Signout</button>
+        <p>Username: {session?.user?.name || "N/A"}</p>
+        <button onClick={submitHandler}>Sign Out</button>
       </main>
       <Footer />
     </>
@@ -35,7 +36,7 @@ export const getServerSideProps = async (context: any) => {
   if (!session) {
     return {
       redirect: {
-        destination: "/",
+        destination: "/signin",
         permanent: false,
       },
     };

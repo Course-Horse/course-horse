@@ -7,7 +7,6 @@ import styles from "./navbar.module.scss";
 
 export default function NavBar() {
   const { data: session } = useSession();
-  console.log("session", session);
 
   return (
     <Navbar expand="lg" className={`bg-body-tertiary ${styles.navbar}`}>
@@ -26,12 +25,12 @@ export default function NavBar() {
         <Navbar.Collapse>
           {session ? (
             <Nav className={`me-auto ${styles.navContainer}`}>
-              <Nav.Link href="/dashboard">Dashboard</Nav.Link>
+              <Nav.Link href="/courses">Courses</Nav.Link>
               <Nav.Link href="/profile">My Profile</Nav.Link>
             </Nav>
           ) : (
             <Nav className={`me-auto ${styles.navContainer}`}>
-              <Nav.Link href={"/api/auth/signin"}>Sign in</Nav.Link>
+              <Nav.Link href={"/signin"}>Sign in</Nav.Link>
             </Nav>
           )}
         </Navbar.Collapse>
