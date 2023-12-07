@@ -1,4 +1,5 @@
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -30,7 +31,8 @@ export default function NavBar() {
             </Nav>
           ) : (
             <Nav className={`me-auto ${styles.navContainer}`}>
-              <Nav.Link href={"/signin"}>Sign in</Nav.Link>
+              <Nav.Link href={"/signup"}>Sign Up</Nav.Link>
+              <Nav.Link href={"/signin"}>Sign In</Nav.Link>
             </Nav>
           )}
         </Navbar.Collapse>

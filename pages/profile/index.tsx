@@ -1,12 +1,13 @@
 import { getSession, useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import Head from "next/head";
+
+import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
 import Footer from "@/components/footer/footer";
 
 export default function MyProfile() {
   const { data: session } = useSession();
-  console.log(session);
 
   async function submitHandler(e: any) {
     e.preventDefault();
@@ -31,18 +32,5 @@ export default function MyProfile() {
 }
 
 export const getServerSideProps = async (context: any) => {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
+  return auth.checkAuthenticated(context, false, "/signin");
 };

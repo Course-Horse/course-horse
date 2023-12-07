@@ -1,6 +1,11 @@
 import validator from "@/data/validator.js";
 import { ObjectId } from "mongodb";
 
+/**
+ * Gets all docs as an array from a collection
+ * @param {function} collectionGetter - function that returns the collection. refer to @/config/mongoCollections.ts
+ * @returns an array of objects
+ */
 async function getAllDocs(collectionGetter) {
   let collection = await collectionGetter();
   let allDocs = await collection.find({}).toArray();
@@ -11,6 +16,13 @@ async function getAllDocs(collectionGetter) {
   return allDocs;
 }
 
+/**
+ * Gets one document from a collection by its _id
+ * @param {function} collectionGetter - function that returns the collection
+ * @param {string} id - id of the doc to get
+ * @param {string} docType - name of docType (e.g. "user")
+ * @returns
+ */
 async function getDocById(collectionGetter, id, docType) {
   id = validator.checkId(id, "id");
 
@@ -20,6 +32,15 @@ async function getDocById(collectionGetter, id, docType) {
   return doc;
 }
 
+/**
+ * Gets one document from a collection by a given attribute
+ * e.g. get a user by username
+ * @param {function} collectionGetter - function that returns the collection
+ * @param {string} param - attribute to search by
+ * @param {any} paramValue - value of the attribute
+ * @param {string} docType - name of docType (e.g. "user")
+ * @returns
+ */
 async function getDocByParam(collectionGetter, param, paramValue, docType) {
   let collection = await collectionGetter();
   let filter = {};
@@ -29,14 +50,36 @@ async function getDocByParam(collectionGetter, param, paramValue, docType) {
   return doc;
 }
 
+/**
+ * Gets all documents from a collection by a given attribute
+ * e.g. gets all users with a given role
+ * @param {function} collectionGetter - function that returns the collection
+ * @param {string} param - attribute to search by
+ * @param {any} paramValue - value of the attribute
+ * @param {string} docType - name of docType (e.g. "user")
+ * @returns
+ */
 async function getAllDocsByParam(collectionGetter, param, paramValue, docType) {
   let collection = await collectionGetter();
   let filter = {};
   filter[param] = paramValue;
   let allDocs = await collection.find(filter).toArray();
+  if (allDocs.length === 0)
+    throw `no ${docType} with ${param} of ${paramValue}`;
   return allDocs;
 }
 
+/**
+ * Gets all documents from a collection by a given attribute, skiping a given number of documents and limiting the number of documents returned
+ * e.g. gets all users with a given role, skipping the first 10 and limiting to 10
+ * @param {function} collectionGetter - function that returns the collection
+ * @param {string} param - attribute to search by
+ * @param {any} paramValue - value of the attribute
+ * @param {string} docType - name of docType (e.g. "user")
+ * @param {int} skip - number of documents to skip
+ * @param {int} limit - number of documents to limit
+ * @returns
+ */
 async function getAllDocsByParamSkipLimit(
   collectionGetter,
   param,
@@ -52,6 +95,13 @@ async function getAllDocsByParamSkipLimit(
   return allDocs;
 }
 
+/**
+ * Creates a doc in a collection
+ * @param {function} collectionGetter - function that returns the collection
+ * @param {object} doc - doc to create
+ * @param {string} docType - name of docType (e.g. "user")
+ * @returns
+ */
 async function createDoc(collectionGetter, doc, docType) {
   let collection = await collectionGetter();
   let insertInfo = await collection.insertOne(doc);
@@ -67,7 +117,7 @@ async function createDoc(collectionGetter, doc, docType) {
  * deletes doc from a collection by its id
  * @param {function} collectionGetter - function that returns the collection
  * @param {string} id - id of the doc to delete
- * @param {string} docType - name of docType
+ * @param {string} docType - name of docType (e.g. "user")
  * @returns object of deleted doc
  */
 async function deleteDocById(collectionGetter, id, docType) {
@@ -83,6 +133,14 @@ async function deleteDocById(collectionGetter, id, docType) {
   return deletionInfo.value;
 }
 
+/**
+ * Replace a doc in a collection by its id
+ * @param {function} collectionGetter - function that returns the collection
+ * @param {string} id - _id of the doc to replace
+ * @param {object} replacement - replacement doc
+ * @param {string} docType - name of docType (e.g. "user")
+ * @returns
+ */
 async function replaceDocById(collectionGetter, id, replacement, docType) {
   id = validator.checkId(id, "id");
 

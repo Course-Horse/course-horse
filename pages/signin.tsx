@@ -1,11 +1,12 @@
 import { useRef } from "react";
-import { signIn, getSession } from "next-auth/react";
 import Head from "next/head";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 import styles from "@/styles/signin.module.scss";
-import Footer from "@/components/footer/footer";
+import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
-import Link from "next/link";
+import Footer from "@/components/footer/footer";
 
 export default function Signin() {
   const username = useRef("");
@@ -28,7 +29,7 @@ export default function Signin() {
         <title>Signin | Course Horse</title>
         <meta
           name="description"
-          content="Signin to your Course Horse account."
+          content="Sign in to your Course Horse account."
         />
       </Head>
       <NavBar />
@@ -63,18 +64,5 @@ export default function Signin() {
 }
 
 export const getServerSideProps = async (context: any) => {
-  const session = await getSession(context);
-
-  if (session) {
-    return {
-      redirect: {
-        destination: "/profile",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
+  return await auth.checkAuthenticated(context, true, "/profile");
 };

@@ -1,12 +1,12 @@
-import { getSession } from "next-auth/react";
 import Link from "next/link";
 import Head from "next/head";
 import axios from "axios";
 import $ from "jquery";
 
 import styles from "@/styles/signup.module.scss";
-import Footer from "@/components/footer/footer";
+import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
+import Footer from "@/components/footer/footer";
 
 export default function Register() {
   function submitHandler(e: any) {
@@ -73,6 +73,7 @@ export default function Register() {
               </div>
             </div>
             <div>
+              <label htmlFor="type">I am a...</label>
               <select name="type" id="type">
                 <option value="learner">Learner</option>
                 <option value="educator">Educator</option>
@@ -89,18 +90,5 @@ export default function Register() {
 }
 
 export const getServerSideProps = async (context: any) => {
-  const session = await getSession(context);
-
-  if (session) {
-    return {
-      redirect: {
-        destination: "/profile",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
+  return await auth.checkAuthenticated(context, true, "/profile");
 };
