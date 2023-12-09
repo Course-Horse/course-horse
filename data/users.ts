@@ -47,8 +47,7 @@ const methods = {
     password: string,
     email: string,
     firstName: string,
-    lastName: string,
-    type: string
+    lastName: string
   ) {
     // TODO: validate username
     // TODO: validate password
@@ -63,7 +62,7 @@ const methods = {
       email: email,
       firstName: firstName,
       lastName: lastName,
-      type: type,
+      type: "learner",
     };
 
     let result = helpers.createDoc(users, user, "user");

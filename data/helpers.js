@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 /**
  * Gets all docs as an array from a collection
  * @param {function} collectionGetter - function that returns the collection. refer to @/config/mongoCollections.ts
- * @returns an array of objects
+ * @returns {Array<object>} of docs
  */
 async function getAllDocs(collectionGetter) {
   let collection = await collectionGetter();
@@ -21,7 +21,7 @@ async function getAllDocs(collectionGetter) {
  * @param {function} collectionGetter - function that returns the collection
  * @param {string} id - id of the doc to get
  * @param {string} docType - name of docType (e.g. "user")
- * @returns
+ * @returns {object} of the doc
  */
 async function getDocById(collectionGetter, id, docType) {
   id = validator.checkId(id, "id");
@@ -39,7 +39,7 @@ async function getDocById(collectionGetter, id, docType) {
  * @param {string} param - attribute to search by
  * @param {any} paramValue - value of the attribute
  * @param {string} docType - name of docType (e.g. "user")
- * @returns
+ * @returns {object} of the doc
  */
 async function getDocByParam(collectionGetter, param, paramValue, docType) {
   let collection = await collectionGetter();
@@ -57,7 +57,7 @@ async function getDocByParam(collectionGetter, param, paramValue, docType) {
  * @param {string} param - attribute to search by
  * @param {any} paramValue - value of the attribute
  * @param {string} docType - name of docType (e.g. "user")
- * @returns
+ * @returns {Array<object>} of docs
  */
 async function getAllDocsByParam(collectionGetter, param, paramValue, docType) {
   let collection = await collectionGetter();
@@ -78,7 +78,7 @@ async function getAllDocsByParam(collectionGetter, param, paramValue, docType) {
  * @param {string} docType - name of docType (e.g. "user")
  * @param {int} skip - number of documents to skip
  * @param {int} limit - number of documents to limit
- * @returns
+ * @returns {Array<object>} of docs
  */
 async function getAllDocsByParamSkipLimit(
   collectionGetter,
@@ -92,6 +92,8 @@ async function getAllDocsByParamSkipLimit(
   let filter = {};
   filter[param] = paramValue;
   let allDocs = await collection.find(filter).skip(skip).limit(limit).toArray();
+  if (allDocs.length === 0)
+    throw `no ${docType} with ${param} of ${paramValue}`;
   return allDocs;
 }
 
@@ -100,7 +102,7 @@ async function getAllDocsByParamSkipLimit(
  * @param {function} collectionGetter - function that returns the collection
  * @param {object} doc - doc to create
  * @param {string} docType - name of docType (e.g. "user")
- * @returns
+ * @returns {object} of created doc
  */
 async function createDoc(collectionGetter, doc, docType) {
   let collection = await collectionGetter();
@@ -139,7 +141,7 @@ async function deleteDocById(collectionGetter, id, docType) {
  * @param {string} id - _id of the doc to replace
  * @param {object} replacement - replacement doc
  * @param {string} docType - name of docType (e.g. "user")
- * @returns
+ * @returns {object} of the replaced doc
  */
 async function replaceDocById(collectionGetter, id, replacement, docType) {
   id = validator.checkId(id, "id");

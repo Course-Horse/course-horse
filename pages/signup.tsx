@@ -72,13 +72,6 @@ export default function Register() {
                 <input type="text" id="lastName" />
               </div>
             </div>
-            <div>
-              <label htmlFor="type">I am a...</label>
-              <select name="type" id="type">
-                <option value="learner">Learner</option>
-                <option value="educator">Educator</option>
-              </select>
-            </div>
             <button type="submit">Sign Up</button>
             <Link href="/signin">Already have an account? Sign in here!</Link>
           </form>

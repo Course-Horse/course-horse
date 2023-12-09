@@ -35,8 +35,7 @@ export default async function handler(
         req.body.password,
         req.body.email,
         req.body.firstName,
-        req.body.lastName,
-        req.body.type
+        req.body.lastName
       );
     } catch (e) {
       return res.status(400).json({ error: e });
