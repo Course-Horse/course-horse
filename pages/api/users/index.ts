@@ -5,7 +5,7 @@ import { userData } from "@/data";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<any>
 ) {
   const method = req.method;
   const session = await getSession({ req });

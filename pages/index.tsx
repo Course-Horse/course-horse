@@ -40,7 +40,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <Image src="/logo.png" />
+            <Image src="/horse.gif" />
           </div>
         </div>
       </main>

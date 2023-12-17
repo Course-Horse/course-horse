@@ -54,7 +54,9 @@ export default function Signin() {
               />
             </div>
             <button type="submit">Sign in</button>
-            <Link href="/signup">Don't have an account? Sign up here!</Link>
+            <Link href="/signup">
+              Don&apos;t have an account? Sign up here!
+            </Link>
           </form>
         </div>
       </main>

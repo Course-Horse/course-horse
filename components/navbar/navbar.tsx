@@ -26,6 +26,7 @@ export default function NavBar() {
         <Navbar.Collapse>
           {session ? (
             <Nav className={`me-auto ${styles.navContainer}`}>
+              <Nav.Link href="/courses/create">Create Course</Nav.Link>
               <Nav.Link href="/courses">Courses</Nav.Link>
               <Nav.Link href="/profile">My Profile</Nav.Link>
             </Nav>
