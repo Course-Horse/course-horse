@@ -1,11 +1,14 @@
 /*
+COURSES COLLECTION SCHEMA
 {
     _id: ObjectId,
-    educator: ObjectId,
+    owner: ObjectId,
     name: String,
+    coursePicture: String,
     description: String,
+    tags: [String],
     created: integer,
-    enrolled: [ObjectId],
+    lessons: [ObjectId],
 }
 */
 

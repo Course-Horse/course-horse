@@ -1,4 +1,4 @@
-import validator from "@/data/validator.js";
+import validator from "./validator.js";
 import { ObjectId } from "mongodb";
 
 /**
