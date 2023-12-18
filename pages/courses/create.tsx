@@ -50,7 +50,5 @@ export default function CreateCourse() {
 }
 
 export const getServerSideProps = async (context: any) => {
-  let check = await auth.checkAuthenticated(context, false, "/signin");
-  if (check.redirect !== undefined) return check;
-  return await auth.checkRole(context, ["educator", "admin"], "/apply");
+  return await auth.checkEducator(context, false, "/apply");
 };

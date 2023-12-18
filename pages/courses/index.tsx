@@ -2,6 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { getSession } from "next-auth/react";
 
+import auth from "@/auth/";
 import styles from "@/styles/courses.module.scss";
 import Footer from "@/components/footer/footer";
 import NavBar from "@/components/navbar/navbar";
@@ -82,18 +83,5 @@ export default function Courses() {
 }
 
 export const getServerSideProps = async (context: any) => {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
+  return auth.checkAuthenticated(context, false, "/signin");
 };

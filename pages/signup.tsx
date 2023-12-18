@@ -52,6 +52,7 @@ export default function Register() {
         window.location.href = "/signin";
       })
       .catch((err) => {
+        console.log(err);
         if (err.response && err.response.data) {
           alert(err.response.data.error);
         } else {
