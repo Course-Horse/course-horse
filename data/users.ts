@@ -32,13 +32,12 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async authUser(username: string, password: string): Promise<any> {
-    // TODO: validate username
-    // TODO: validate password
+    username = validator.checkUsername(username, "username");
+    password = validator.checkPassword(password, "password");
 
     let user = await mongo.getDocByParam(users, "username", username, "user");
-    // TODO: change to encrypting and checking hashes
-    if (password !== user.password)
-      throw `Error authenticating user ${username}`;
+    let comparison = await bcrypt.compare(password, user.password);
+    if (!comparison) throw new Error("invalid password");
 
     delete user.password;
     return user;
