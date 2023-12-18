@@ -39,6 +39,13 @@ export interface Course {
 	lessons: string[], // array of lesson ObjectIds()
 }
 
+export interface CourseUpdate{
+    title?: string;
+    description?: string;
+    coursePicture?: string; // begins with "data:image/"
+    tags?: string[];
+}
+
 export interface Lesson {
     _id: string; // lesson ObjectId()
     courseId: string; // course ObjectId()
