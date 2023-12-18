@@ -23,6 +23,23 @@ const exportedMethods = {
     return arr;
   },
 
+  checkVideoStringArray(arr, varName) {
+    if (!arr || !Array.isArray(arr))
+      throw `You must provide an array of ${varName}`;
+    for (let i in arr) {
+      if (
+        typeof arr[i] !== "string" ||
+        arr[i].trim().length === 0 ||
+        !arr[i].trim().startsWith("https://www.youtube.com/embed/")
+      ) {
+        throw `One or more elements in ${varName} array is not a string or is an empty string or does not start with "https://www.youtube.com/embed/"`;
+      }
+      arr[i] = arr[i].trim();
+    }
+
+    return arr;
+  },
+
   isObject(variable) {
     return Object.prototype.toString.call(variable) === "[object Object]";
   },
@@ -84,7 +101,7 @@ const exportedMethods = {
     image = this.checkString(image, varName);
     if (!image.startsWith("data:image/"))
       throw `${varName} must begin with 'data:image/'`;
-    return image;
+    return image.trim();
   },
 };
 
