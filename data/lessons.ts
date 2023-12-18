@@ -74,11 +74,7 @@ const methods = {
     return result;
   },
 
-  async updateCourse(id: string, fields: object) {
-    return "IMPLEMENT ME";
-  },
-
-  async deleteCourse(id: string) {
+  async deleteLesson(lessonId: string) {
     return "IMPLEMENT ME";
   },
 };
