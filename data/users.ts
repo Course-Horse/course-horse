@@ -1,6 +1,6 @@
 import { users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-import { User } from "@/types";
+import { User, UserUpdate } from "@/types";
 import bcrypt from "bcrypt";
 
 const methods = {
@@ -32,12 +32,21 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async authUser(username: string, password: string): Promise<any> {
+    // validate username
     username = validator.checkUsername(username, "username");
+
+    // validate password
     password = validator.checkPassword(password, "password");
 
-    let user = await mongo.getDocByParam(users, "username", username, "user");
+    // retrieve specified user and check for matching passwords
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
     let comparison = await bcrypt.compare(password, user.password);
-    if (!comparison) throw new Error("invalid password");
+    if (!comparison) throw "invalid password";
 
     delete user.password;
     return user;
@@ -60,10 +69,10 @@ const methods = {
     lastName: string
   ): Promise<any> {
     // validate username and check if username already exists
-    validator.checkUsername(username, "username");
+    username = validator.checkUsername(username, "username");
     let usernameTaken = false;
     try {
-      await mongo.getAllDocsByParam(users, "username", username, "user");
+      await mongo.getDocByParam(users, "username", username, "user");
       usernameTaken = true;
     } catch (e) {}
     if (usernameTaken) {
@@ -71,16 +80,16 @@ const methods = {
     }
 
     // validate password
-    validator.checkPassword(password, "password");
+    password = validator.checkPassword(password, "password");
 
     // validate email
-    validator.checkEmail(email, "email");
+    email = validator.checkEmail(email, "email");
 
     // validate first name
-    validator.checkName(firstName, "first name");
+    firstName = validator.checkName(firstName, "first name");
 
     // validate last name
-    validator.checkName(lastName, "last name");
+    lastName = validator.checkName(lastName, "last name");
 
     // encrypt password with specified salt rounds
     const saltRounds = 16;
@@ -94,6 +103,7 @@ const methods = {
       firstName: firstName,
       lastName: lastName,
       profilePicture: "",
+      bio: "",
       created: new Date(),
       admin: false,
       enrolledCourses: [],
@@ -112,10 +122,47 @@ const methods = {
    * @param {object} fields Object whos fields correspond to the fields to update
    * @returns {Promise} Promise object that resolves to a user object
    */
-  async updateUser(username: string, fields: object): Promise<any> {
-    const UPDATEABLE = ["password", "email", "firstName", "lastName"];
+  async updateUser(username: string, fields: UserUpdate): Promise<any> {
+    // retrive user from database
+    let new_user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
 
-    return "IMPLEMENT ME";
+    // validate email
+    if (fields.hasOwnProperty("email")) {
+      new_user.email = validator.checkEmail(fields.email);
+    }
+
+    // validate first name
+    if (fields.hasOwnProperty("email")) {
+      new_user.email = validator.checkEmail(fields.email);
+    }
+
+    // validate last name
+    if (fields.hasOwnProperty("email")) {
+      new_user.email = validator.checkEmail(fields.email);
+    }
+
+    // validate bio
+    if (fields.hasOwnProperty("email")) {
+      new_user.email = validator.checkEmail(fields.email);
+    }
+
+    // validate password and encrypt with specified salt rounds
+    if (fields.hasOwnProperty("password")) {
+      let password = validator.checkPassword(fields.password, "password");
+      const saltRounds = 16;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      new_user.password = hashedPassword;
+    }
+
+    // update user in database using mongo helper functions
+    let result = (await mongo.replaceDocById(users, new_user._id, new_user, "user")) as User;
+    delete result.password;
+    return result;
   },
 
   /**
