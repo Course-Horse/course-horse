@@ -1,29 +1,7 @@
-/*
-USERS COLLECTION SCHEMA
-{
-    _id: ObjectId,
-    username: String,
-    password: String,
-    email: String,
-    firstName: String,
-    lastName: String,
-    profilePicture: String (default: /default-profile-picture.png),
-    created: integer,
-    type: String (admin, educator, learner),
-    enrolled: [ObjectId],
-    application: {
-        status: String (pending, accepted, rejected - default: pending),
-        created: integer
-        content: String,
-        documents: [string]
-    } || null (default: null)
-}
-*/
-
 import { users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-
-const USERTYPES = ["admin", "educator", "learner"];
+import { User } from "@/types";
+import bcrypt from "bcrypt";
 
 const methods = {
   /**
@@ -67,7 +45,7 @@ const methods = {
   },
 
   /**
-   * Creates a new user
+   * Creates a new user in the database
    * @param {string} username of the user to create
    * @param {string} password of the user to create
    * @param {string} email of the user to create
@@ -82,23 +60,49 @@ const methods = {
     firstName: string,
     lastName: string
   ): Promise<any> {
-    // TODO: validate username
-    // TODO: validate password
-    // TODO: validate email
-    // TODO: validate firstName
-    // TODO: validate lastName
-    // TODO: validate type
+    // validate username and check if username already exists
+    validator.checkUsername(username, "username");
+    let usernameTaken = false;
+    try {
+      await mongo.getAllDocsByParam(users, "username", username, "user");
+      usernameTaken = true;
+    } catch (e) {}
+    if (usernameTaken) {
+      throw "username taken";
+    }
 
+    // validate password
+    validator.checkPassword(password, "password");
+
+    // validate email
+    validator.checkEmail(email, "email");
+
+    // validate first name
+    validator.checkName(firstName, "first name");
+
+    // validate last name
+    validator.checkName(lastName, "last name");
+
+    // encrypt password with specified salt rounds
+    const saltRounds = 16;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // create user object
     let user = {
       username: username,
-      password: password,
+      password: hashedPassword,
       email: email,
       firstName: firstName,
       lastName: lastName,
-      type: "learner",
+      profilePicture: "",
+      created: new Date(),
+      admin: false,
+      enrolledCourses: [],
+      application: null,
     };
 
-    let result = mongo.createDoc(users, user, "user");
+    // add user object to database using mongo helper functions
+    let result = (await mongo.createDoc(users, user, "user")) as User;
     delete result.password;
     return result;
   },

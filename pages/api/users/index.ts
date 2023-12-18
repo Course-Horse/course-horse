@@ -27,10 +27,9 @@ export default async function handler(
 
   if (method === "POST") {
     // TODO: check for and validate body fields
-    console.log(req.body);
     let result;
     try {
-      await userData.createUser(
+      result = await userData.createUser(
         req.body.username,
         req.body.password,
         req.body.email,
