@@ -1,26 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/react";
+import auth from "@/auth";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await getSession({ req });
+  const session = await auth.getSession({ req });
 
-  // GET SINGLE COURSE
-  if (method === "GET") {
-    return res.status(500).json({ TODO: `IMPLEMENT ME` });
-  }
+  switch (method) {
+    // GET SINGLE COURSE
+    case "GET":
+      return res.status(500).json({ TODO: `IMPLEMENT ME` });
 
-  // UPDATE COURSE INFO
-  if (method === "POST") {
-    return res.status(500).json({ TODO: `IMPLEMENT ME` });
-  }
+    // UPDATE COURSE INFO
+    case "POST":
+      return res.status(500).json({ TODO: `IMPLEMENT ME` });
 
-  // DELETE COURSE
-  if (method === "DELETE") {
-    return res.status(500).json({ TODO: `IMPLEMENT ME` });
+    // DELETE COURSE
+    case "DELETE":
+      return res.status(500).json({ TODO: `IMPLEMENT ME` });
   }
 
   return res

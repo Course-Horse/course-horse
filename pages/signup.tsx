@@ -10,7 +10,7 @@ import validator from "@/data/helpers/validator.js";
 import styles from "@/styles/signup.module.scss";
 import NavBar from "@/components/navbar/navbar";
 
-export default function Register({ username }: { username: any }) {
+export default function Signup({ username }: { username: any }) {
   const [loading, setLoading] = useState(false);
 
   function submitHandler(e: any) {
@@ -39,9 +39,13 @@ export default function Register({ username }: { username: any }) {
     }
 
     axios
-      .get(
-        `/api/users?method=POST&username=${username}&password=${password}&email=${email}&firstName=${firstName}&lastName=${lastName}`
-      )
+      .post(`/api/users`, {
+        username,
+        password,
+        email,
+        firstName,
+        lastName,
+      })
       .then((res) => {
         console.log(res);
         window.location.href = "/signin";

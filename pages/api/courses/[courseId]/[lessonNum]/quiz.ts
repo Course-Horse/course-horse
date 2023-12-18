@@ -9,16 +9,12 @@ export default async function handler(
   const session = await auth.getSession({ req, res });
 
   switch (method) {
-    // GET SINGLE LESSON
+    // GETS WHETHER QUIZ IS COMPLETED
     case "GET":
       return res.status(500).json({ TODO: `IMPLEMENT ME` });
 
-    // UPDATE LESSON
+    // SUBMITS QUIZ
     case "POST":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
-
-    // DELETE LESSON
-    case "DELETE":
       return res.status(500).json({ TODO: `IMPLEMENT ME` });
   }
 

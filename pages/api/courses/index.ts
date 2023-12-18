@@ -8,14 +8,14 @@ export default async function handler(
   const method = req.method;
   const session = await getSession({ req });
 
-  // GET LIST OF COURSES
-  if (method === "GET") {
-    return res.status(500).json({ TODO: `IMPLEMENT ME` });
-  }
+  switch (method) {
+    // GET LIST OF COURSES
+    case "GET":
+      return res.status(500).json({ TODO: `IMPLEMENT ME` });
 
-  // CREATE COURSE
-  if (method === "POST") {
-    return res.status(500).json({ TODO: `IMPLEMENT ME` });
+    // CREATE COURSE
+    case "POST":
+      return res.status(500).json({ TODO: `IMPLEMENT ME` });
   }
 
   return res

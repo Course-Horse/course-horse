@@ -6,19 +6,11 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await auth.getSession({ req, res });
+  const session = await auth.getSession({ req });
 
   switch (method) {
-    // GET SINGLE LESSON
+    // TOGGLES ENROLLMENT IN COURSE
     case "GET":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
-
-    // UPDATE LESSON
-    case "POST":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
-
-    // DELETE LESSON
-    case "DELETE":
       return res.status(500).json({ TODO: `IMPLEMENT ME` });
   }
 
