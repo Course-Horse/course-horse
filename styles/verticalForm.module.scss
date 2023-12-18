@@ -3,6 +3,12 @@
   flex-direction: column;
   gap: 10px;
 
+  img {
+    width: 200px;
+    height: 200px;
+    align-self: center;
+  }
+
   > div {
     width: 100%;
     display: flex;
@@ -23,4 +29,11 @@
       font-weight: 500;
     }
   }
+}
+
+.sideBy {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
 }

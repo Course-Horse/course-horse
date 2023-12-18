@@ -55,7 +55,8 @@ export default function Course({ username }: { username: any }) {
           setLoading(false);
         })
         .catch((err) => {
-          console.log(err);
+          alert("Unable to load course.");
+          window.location.href = "/courses";
         });
     }
   }, []);
@@ -78,11 +79,17 @@ export default function Course({ username }: { username: any }) {
               <img src={data.coursePicture} />
               <div>
                 <h1>{data.title}</h1>
+                <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
               </div>
             </div>
             <div className={styles.lessonList}>
-              <h2>Lessons</h2>
+              <h2>Lessons </h2>
+              {data.creator !== username ? null : (
+                <Button href={`/courses/${courseId}/create`}>
+                  Create Lesson
+                </Button>
+              )}
               <div>
                 {data.lessons.length === 0 ? (
                   <h3>No Lessons Available</h3>

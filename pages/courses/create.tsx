@@ -94,6 +94,7 @@ export default function CreateCourse({ username }: { username: any }) {
             <textarea id="courseDescription" placeholder="Course Description" />
           </div>
           <div id="tags">
+            <h4>Course Tags</h4>
             {TAGS.map((tag) => {
               let lower = tag.toLocaleLowerCase();
               return (

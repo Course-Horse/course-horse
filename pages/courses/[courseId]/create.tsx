@@ -1,12 +1,64 @@
 import Head from "next/head";
+import $ from "jquery";
+import axios from "axios";
+import { useParams } from "next/navigation";
 
+import validator from "@/data/helpers/validator.js";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
 import TextInputList from "@/components/textInputList/textInputList";
 
 export default function CreateLesson({ username }: { username: any }) {
-  function createLesson() {}
+  const { courseId } = useParams();
+
+  function submitLesson(e: any) {
+    e.preventDefault();
+    let title = $("#lessonName").val();
+    let description = $("#lessonDescription").val();
+    let content = $("#lessonContent").val();
+    let videos = $("#ytLinks input");
+    let videoList = [];
+    for (let video of videos) {
+      if (video.value) {
+        videoList.push(video.value);
+      }
+    }
+    let quiz = undefined;
+
+    console.log(title, description, content, videoList, quiz);
+
+    try {
+      title = validator.checkString(title, "Lesson Name");
+      description = validator.checkString(description, "Lesson Description");
+      content = validator.checkString(content, "Lesson Content");
+      videoList = validator.checkVideoStringArray(videoList, "Youtube Links");
+    } catch (e) {
+      alert(e);
+      return;
+    }
+
+    axios
+      .post(`/api/courses/${courseId}/create`, {
+        title,
+        description,
+        content,
+        videos: videoList,
+        quiz,
+      })
+      .then((res) => {
+        console.log(res);
+        window.location.href = `/courses/${courseId}`;
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response && err.response.data) {
+          alert(err.response.data.error);
+        } else {
+          alert("error occurred please try again");
+        }
+      });
+  }
 
   return (
     <>
@@ -17,7 +69,11 @@ export default function CreateLesson({ username }: { username: any }) {
       <NavBar username={username} />
       <main className="pageContainer">
         <h1>Create Lesson</h1>
-        <form method="POST" className={verticalFormStyles.form}>
+        <form
+          method="POST"
+          className={verticalFormStyles.form}
+          onSubmit={submitLesson}
+        >
           <div>
             <label htmlFor="lessonName">Lesson Name</label>
             <input id="lessonName" type="text" placeholder="Lesson Name" />

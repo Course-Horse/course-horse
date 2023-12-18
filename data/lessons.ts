@@ -8,7 +8,15 @@ const methods = {
   },
 
   async getLesson(lessonId: string) {
-    return "IMPLEMENT ME";
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    let result = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lesson"
+    )) as Lesson;
+
+    return result;
   },
 
   /**
