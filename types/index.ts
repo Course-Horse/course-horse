@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export interface User {
   _id: string;
   username: string;
@@ -28,4 +26,15 @@ export interface UserUpdate {
   firstName?: string;
   lastName?: string;
   bio?: string;
+}
+
+export interface Course {
+    _id: string;
+    creator: string;
+    title: string;
+    description: string;
+    coursePicture: string;
+	tags: string[];
+    created: Date,
+	lessons: string[],
 }

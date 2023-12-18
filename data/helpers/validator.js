@@ -79,6 +79,13 @@ const exportedMethods = {
       throw `${varName} can only include letters and hyphens`;
     return name;
   },
+
+  checkImage(image, varName) {
+    image = this.checkString(image, varName);
+    if (!image.startsWith("data:image/"))
+      throw `${varName} must begin with 'data:image/'`;
+    return image;
+  },
 };
 
 export default exportedMethods;
