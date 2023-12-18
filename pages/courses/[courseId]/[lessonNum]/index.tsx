@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { Button } from "react-bootstrap";
 
-import headerStyle from "@/styles/header.module.scss";
-import styles from "@/styles/course.module.scss";
+import styles from "@/styles/lesson.module.scss";
+import headerStyles from "@/styles/header.module.scss";
 import NavBar from "@/components/navbar/navbar";
 import Footer from "@/components/footer/footer";
+import { Button } from "react-bootstrap";
 
 const DUMMY = {
   // _id: ObjectId,
@@ -22,10 +22,16 @@ const DUMMY = {
       title: "Introduction",
       description: "Brief introduction to the art of Burger Flipping.",
       content: "Hello.",
-      videos: [],
+      videos: [
+        "https://www.youtube.com/embed/1Onr4z2fdDM?si=TCCr6F8Xp9KAtNFw",
+        "https://www.youtube.com/embed/1Onr4z2fdDM?si=TCCr6F8Xp9KAtNFw",
+        "https://www.youtube.com/embed/1Onr4z2fdDM?si=TCCr6F8Xp9KAtNFw",
+        "https://www.youtube.com/embed/1Onr4z2fdDM?si=TCCr6F8Xp9KAtNFw",
+      ],
       created: Math.floor(Date.now() / 1000),
       viewed: [],
       quiz: {
+        description: "This quiz will test your knowledge on the introduction.",
         questions: [
           {
             question: "What's my name?",
@@ -56,41 +62,26 @@ const DUMMY = {
   ],
 };
 
-function LessonPreview({
-  courseId,
-  num,
-  data,
-}: {
-  courseId: string;
-  num: number;
-  data: any;
-}) {
+const data = DUMMY;
+const lesson = DUMMY.lessons[0];
+
+function YTEmbed({ link }: { link: string }) {
   return (
-    <div>
-      <h3>
-        Lesson {num}: {data.title}
-      </h3>
-      <p>{data.description}</p>
-      <div>
-        <Button href={`/courses/${courseId}/${num}`}>
-          Go to Lesson Content
-        </Button>
-        {data.quiz !== null ? (
-          <Button variant="secondary" href={`/courses/${courseId}/${num}/quiz`}>
-            Go to Lesson Quiz
-          </Button>
-        ) : (
-          <></>
-        )}
-      </div>
-    </div>
+    <iframe
+      width="400"
+      height="300"
+      src={link}
+      title="YouTube video player"
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowFullScreen
+    ></iframe>
   );
 }
 
-export default function Course() {
+export default function Lesson() {
   const router = useRouter();
-  const { courseId } = router.query;
-  let data = DUMMY;
+  const { courseId, lessonNum } = router.query;
 
   return (
     <>
@@ -100,28 +91,47 @@ export default function Course() {
       </Head>
       <NavBar />
       <main className="pageContainer">
-        <div className={headerStyle.header}>
+        <div className={headerStyles.header}>
           <img src={data.coursePicture} />
           <div>
             <h1>{data.title}</h1>
-            <p>{data.description}</p>
+            <h2>
+              Lesson {lessonNum}: {lesson.title}
+            </h2>
+            <p>{lesson.description}</p>
           </div>
         </div>
-        <div className={styles.lessonList}>
-          <h2>Lessons</h2>
+        <div className={styles.content}>
+          <h3>Lesson Content</h3>
           <div>
-            {data.lessons.map((lesson, index) => {
-              return (
-                <LessonPreview
-                  key={index}
-                  courseId={courseId}
-                  num={index}
-                  data={lesson}
-                />
-              );
-            })}
+            <p>{lesson.content}</p>
           </div>
         </div>
+        {lesson.videos.length > 0 ? (
+          <div className={styles.videos}>
+            <h3>Lesson Videos</h3>
+            <div>
+              {lesson.videos.map((link, index) => {
+                return <YTEmbed key={`${index}_${link}`} link={link} />;
+              })}
+            </div>
+          </div>
+        ) : (
+          <></>
+        )}
+        {lesson.quiz !== null ? (
+          <div className={styles.quiz}>
+            <h3>Lesson Quiz</h3>
+            <div>
+              <p>{lesson.quiz.description}</p>
+              <Button href={`/courses/${courseId}/${lessonNum}/quiz`}>
+                Start Quiz
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <></>
+        )}
       </main>
       <Footer />
     </>

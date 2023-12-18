@@ -1,0 +1,54 @@
+.content {
+  margin: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  > * {
+    margin: 0;
+  }
+  > div {
+    background-color: var(--bs-gray-200);
+    padding: 20px;
+    border-radius: 15px;
+  }
+}
+
+.videos {
+  margin: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  > * {
+    margin: 0;
+  }
+  > div {
+    display: flex;
+    flex-direction: row;
+    overflow: auto;
+    gap: 20px;
+    background-color: var(--bs-gray-200);
+    padding: 20px;
+    border-radius: 15px;
+  }
+}
+
+.quiz {
+  margin: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  > * {
+    margin: 0;
+  }
+  > div {
+    background-color: var(--bs-gray-200);
+    padding: 20px;
+    border-radius: 15px;
+
+    > p {
+      margin: 5px;
+    }
+  }
+}

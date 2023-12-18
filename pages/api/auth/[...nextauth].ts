@@ -24,7 +24,7 @@ export default nextauth({
             credentials.password
           );
         } catch (e) {
-          return null;
+          throw e;
         }
 
         return {

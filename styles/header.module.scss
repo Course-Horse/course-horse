@@ -1,0 +1,21 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
+  > img {
+    width: 100px;
+    height: 100px;
+    align-self: center;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 10px;
+    > * {
+      margin: 0;
+    }
+  }
+}

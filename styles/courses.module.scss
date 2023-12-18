@@ -3,3 +3,24 @@
   flex-direction: column;
   gap: 20px;
 }
+
+.browse {
+  > form {
+    margin: 5px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

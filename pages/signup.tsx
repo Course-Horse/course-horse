@@ -2,6 +2,9 @@ import Link from "next/link";
 import Head from "next/head";
 import axios from "axios";
 import $ from "jquery";
+import { useState } from "react";
+import { Spinner } from "react-bootstrap";
+import validator from "@/data/helpers/validator.js";
 
 import styles from "@/styles/signup.module.scss";
 import auth from "@/auth/";
@@ -9,14 +12,32 @@ import NavBar from "@/components/navbar/navbar";
 import Footer from "@/components/footer/footer";
 
 export default function Register() {
+  const [loading, setLoading] = useState(false);
+
   function submitHandler(e: any) {
+    setLoading(true);
     e.preventDefault();
 
-    let username = $("#username").val();
-    let password = $("#password").val();
-    let email = $("#email").val();
-    let firstName = $("#firstName").val();
-    let lastName = $("#lastName").val();
+    let username;
+    let password;
+    let email;
+    let firstName;
+    let lastName;
+    try {
+      username = validator.checkUsername($("#username").val(), "username");
+      password = validator.checkPassword($("#password").val(), "password");
+      let confirmPassword = $("#confirmPassword").val();
+      if (password !== confirmPassword) {
+        throw "Passwords do not match";
+      }
+      email = validator.checkEmail($("#email").val(), "email");
+      firstName = validator.checkName($("#firstName").val(), "first name");
+      lastName = validator.checkName($("#lastName").val(), "last name");
+    } catch (e) {
+      alert(e);
+      setLoading(false);
+      return;
+    }
 
     axios
       .post("/api/users", {
@@ -36,6 +57,7 @@ export default function Register() {
         } else {
           alert("error occurred please try again");
         }
+        setLoading(false);
       });
   }
 
@@ -62,6 +84,10 @@ export default function Register() {
               <input type="password" id="password" />
             </div>
             <div>
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input type="password" id="confirmPassword" />
+            </div>
+            <div>
               <label htmlFor="email">Email</label>
               <input type="email" id="email" />
             </div>
@@ -75,7 +101,10 @@ export default function Register() {
                 <input type="text" id="lastName" />
               </div>
             </div>
-            <button type="submit">Sign Up</button>
+            <button type="submit" disabled={loading}>
+              Sign Up
+            </button>
+            {loading ? <Spinner /> : null}
             <Link href="/signin">Already have an account? Sign in here!</Link>
           </form>
         </div>

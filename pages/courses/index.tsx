@@ -38,8 +38,41 @@ export default function Courses() {
             <CourseList courses={dummyCourses} />
           </div>
           <div>
-            <h2>Other Courses</h2>
+            <h2>Enrolled Courses</h2>
             <CourseList courses={dummyCourses} />
+          </div>
+          <div className={styles.browse}>
+            <h2>Browse Other Courses</h2>
+            <form>
+              <div>
+                <label htmlFor="title">Course Title</label>
+                <input id="title" type="text" placeholder="Title" />
+              </div>
+              <div>
+                <label htmlFor="sortBy">Sort By</label>
+                <select id="sortBy">
+                  <option value="title">Title</option>
+                  <option value="date">Date</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="sortOrder">Sort Order</label>
+                <select id="sortOrder">
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="submit">Submit</label>
+                <button id="submit" type="submit">
+                  Search
+                </button>
+              </div>
+            </form>
+            <div>
+              <CourseList courses={dummyCourses} />
+              <button>Load More</button>
+            </div>
           </div>
         </div>
       </main>

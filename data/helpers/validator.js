@@ -1,16 +1,4 @@
-import { ObjectId } from "mongodb";
-
 const exportedMethods = {
-  checkId(id, varName) {
-    if (!id) throw `You must provide a ${varName}`;
-    if (typeof id !== "string") throw `${varName} must be a string`;
-    id = id.trim();
-    if (id.length === 0)
-      throw `${varName} cannot be an empty string or just spaces`;
-    if (!ObjectId.isValid(id)) throw `${varName} invalid object ID`;
-    return id;
-  },
-
   checkString(strVal, varName) {
     if (!strVal) throw `You must supply a ${varName}!`;
     if (typeof strVal !== "string") throw `${varName} must be a string!`;

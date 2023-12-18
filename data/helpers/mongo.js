@@ -1,6 +1,16 @@
 import validator from "./validator.js";
 import { ObjectId } from "mongodb";
 
+function checkId(id, varName) {
+  if (!id) throw `You must provide a ${varName}`;
+  if (typeof id !== "string") throw `${varName} must be a string`;
+  id = id.trim();
+  if (id.length === 0)
+    throw `${varName} cannot be an empty string or just spaces`;
+  if (!ObjectId.isValid(id)) throw `${varName} invalid object ID`;
+  return id;
+}
+
 /**
  * Gets all docs as an array from a collection
  * @param {function} collectionGetter - function that returns the collection. refer to @/config/mongoCollections.ts
@@ -159,6 +169,7 @@ async function replaceDocById(collectionGetter, id, replacement, docType) {
 }
 
 export {
+  checkId,
   getAllDocs,
   getDocById,
   getDocByParam,

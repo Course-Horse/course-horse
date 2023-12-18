@@ -1,0 +1,22 @@
+.lessonList {
+  > h2 {
+    margin: 5px;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    > div {
+      padding: 20px;
+      background-color: var(--bs-gray-200);
+      border-radius: 15px;
+      > div {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
+    }
+  }
+}
