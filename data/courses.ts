@@ -1,6 +1,7 @@
 import { courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
 import { Course, User } from "@/types";
+import { userData } from ".";
 
 const methods = {
   async getCourses() {
@@ -13,7 +14,7 @@ const methods = {
 
   /**
    * Creates a new course in database
-   * @param {string} educatorId
+   * @param {string} username
    * @param {string} title
    * @param {string} description
    * @param {string} coursePicture
@@ -21,40 +22,37 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a course object
    */
   async createCourse(
-    educatorId: string,
+    username: string,
     title: string,
     description: string,
     coursePicture: string,
     tags: string[]
   ) {
-    // validate educatorId and check if user is a valid educator
-    educatorId = mongo.checkId(educatorId, "educatorId");
-    let user = (await mongo.getDocById(users, educatorId, "user")) as User;
-    if (!(user.application && user.application.status === "accepted")) {
+    // validate username and check if user is a valid educator
+    username = validator.checkUsername(username, "educatorId");
+    let user = (await userData.getUser(username)) as User;
+    if (
+      !(user.application && user.application.status === "accepted") &&
+      !user.admin
+    ) {
       throw "user must be an educator to create a course";
     }
 
-    // validate title
+    // validate other fields
     title = validator.checkString(title, "title");
-
-    // validate description
     description = validator.checkString(description, "description");
-
-    // validate coursePicture
     coursePicture = validator.checkImage(coursePicture, "coursePicture");
-
-    // validate tags
     tags = validator.checkStringArray(tags, "tags");
 
     // create course object
     let course = {
-      educatorId: educatorId,
+      educatorId: username,
       title: title,
       description: description,
       coursePicture: coursePicture,
       tags: tags,
       created: new Date(),
-      lessons: []
+      lessons: [],
     };
 
     // add course object to database using mongo helper functions

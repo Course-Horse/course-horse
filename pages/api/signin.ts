@@ -9,8 +9,15 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
+  const session = await auth.getSession({ req, res });
+
   switch (method) {
     case "POST":
+      if (session.username)
+        return res
+          .status(401)
+          .json({ error: "You must be signed out to signin." });
+
       let username = req.body.username;
       let password = req.body.password;
 
@@ -28,7 +35,6 @@ export default async function handler(
         return res.status(500).json({ error: e });
       }
 
-      const session = await auth.getSession({ req, res });
       session.username = username;
       await session.save();
 

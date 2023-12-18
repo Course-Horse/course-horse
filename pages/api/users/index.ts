@@ -16,7 +16,9 @@ export default async function handler(
     case "GET":
       // check if user is signed in
       if (!session.username)
-        return res.status(401).json({ error: "Unauthorized" });
+        return res
+          .status(401)
+          .json({ error: "You must be signed in to get your user data." });
 
       // get user data
       let user;
@@ -31,6 +33,12 @@ export default async function handler(
 
     // CREATE NEW USER
     case "POST":
+      // check if user is signed in
+      if (session.username)
+        return res
+          .status(401)
+          .json({ error: "You must be signed out to create a new account." });
+
       // get and validate input data
       let username;
       let password;

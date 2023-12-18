@@ -73,6 +73,7 @@ export default async function handler(
           }
           return res.status(200).json(result);
 
+        // TODO: implement picture update
         case "picture":
           return res.status(501).json({ error: "Not implemented" });
       }
