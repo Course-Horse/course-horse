@@ -21,5 +21,5 @@ export default function AdminView() {
 }
 
 export const getServerSideProps = async (context: any) => {
-  return await auth.checkRole(context, ["admin"], "/");
+  return await auth.checkAdmin(context);
 };

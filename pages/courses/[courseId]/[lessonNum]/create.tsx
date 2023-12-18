@@ -1,5 +1,6 @@
 import Head from "next/head";
 
+import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
 import Footer from "@/components/footer/footer";
 
@@ -18,3 +19,7 @@ export default function Create() {
     </>
   );
 }
+
+export const getServerSideProps = async (context: any) => {
+  return await auth.checkEducator(context, false, "/apply");
+};

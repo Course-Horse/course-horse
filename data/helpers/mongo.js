@@ -34,7 +34,7 @@ async function getAllDocs(collectionGetter) {
  * @returns {object} of the doc
  */
 async function getDocById(collectionGetter, id, docType) {
-  id = validator.checkId(id, "id");
+  id = checkId(id, "id");
 
   let collection = await collectionGetter();
   let doc = await collection.findOne({ _id: new ObjectId(id) });
@@ -133,7 +133,7 @@ async function createDoc(collectionGetter, doc, docType) {
  * @returns object of deleted doc
  */
 async function deleteDocById(collectionGetter, id, docType) {
-  id = validator.checkId(id, "id");
+  id = checkId(id, "id");
 
   let collection = await collectionGetter();
   let deletionInfo = await collection.findOneAndDelete({
@@ -154,7 +154,7 @@ async function deleteDocById(collectionGetter, id, docType) {
  * @returns {object} of the replaced doc
  */
 async function replaceDocById(collectionGetter, id, replacement, docType) {
-  id = validator.checkId(id, "id");
+  id = checkId(id, "id");
 
   let collection = await collectionGetter();
   let updatedInfo = await collection.findOneAndUpdate(
