@@ -1,11 +1,10 @@
 import Head from "next/head";
 
 import auth from "@/auth/";
-import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
+import NavBar from "@/components/navbar/navbar";
 
-export default function CreateCourse() {
+export default function CreateCourse({ username }: { username: any }) {
   function createCourse() {}
 
   return (
@@ -14,7 +13,7 @@ export default function CreateCourse() {
         <title>Create Course | Course Horse</title>
         <meta name="description" content="Create a course on Course Horse." />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <h1>Create Course</h1>
         <form method="POST" className={verticalFormStyles.form}>
@@ -44,7 +43,6 @@ export default function CreateCourse() {
           </div>
         </form>
       </main>
-      <Footer />
     </>
   );
 }

@@ -1,12 +1,9 @@
 import Head from "next/head";
-import Image from "next/image";
-import { getSession } from "next-auth/react";
 
 import auth from "@/auth/";
 import styles from "@/styles/courses.module.scss";
-import Footer from "@/components/footer/footer";
-import NavBar from "@/components/navbar/navbar";
 import CourseList from "@/components/courseList/courselist";
+import NavBar from "@/components/navbar/navbar";
 
 const dummyCourses = [
   {
@@ -23,14 +20,14 @@ const dummyCourses = [
   },
 ];
 
-export default function Courses() {
+export default function Courses({ username }: { username: any }) {
   return (
     <>
       <Head>
         <title>Courses | Course Horse</title>
         <meta name="description" content="View all courses on Course Horse." />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <h1>Courses</h1>
         <div className={styles.courseListingWrapper}>
@@ -77,7 +74,6 @@ export default function Courses() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

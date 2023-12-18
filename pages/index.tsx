@@ -2,10 +2,8 @@ import Head from "next/head";
 import { Image } from "react-bootstrap";
 
 import styles from "@/styles/index.module.scss";
-import Navbar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 
-export default function Home() {
+export default function Home({ username }: { username: any }) {
   return (
     <>
       <Head>
@@ -15,7 +13,7 @@ export default function Home() {
           content="Your all-in-one online learning platform."
         />
       </Head>
-      <Navbar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <div className={styles.header}>
           <Image src="/logo.png" />
@@ -44,7 +42,17 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
+}
+
+import auth from "@/auth/";
+import NavBar from "@/components/navbar/navbar";
+
+export async function getServerSideProps(context: any) {
+  const session = await auth.getSession(context);
+  let result = {};
+  let username = session.username;
+  if (username) result = { username };
+  return { props: result };
 }

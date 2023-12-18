@@ -1,6 +1,8 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
-export default function Document() {
+import auth from "@/auth/";
+
+export default function Document({ username }: { username: any }) {
   return (
     <Html lang="en">
       <Head />

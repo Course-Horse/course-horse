@@ -3,9 +3,8 @@ import Head from "next/head";
 
 import styles from "@/styles/lesson.module.scss";
 import headerStyles from "@/styles/header.module.scss";
-import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 import { Button } from "react-bootstrap";
+import NavBar from "@/components/navbar/navbar";
 
 const DUMMY = {
   // _id: ObjectId,
@@ -79,7 +78,7 @@ function YTEmbed({ link }: { link: string }) {
   );
 }
 
-export default function Lesson() {
+export default function Lesson({ username }: { username: string }) {
   const router = useRouter();
   const { courseId, lessonNum } = router.query;
 
@@ -89,7 +88,7 @@ export default function Lesson() {
         <title>Course | Course Horse</title>
         <meta name="description" content="View a course on Course Horse." />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <div className={headerStyles.header}>
           <img src={data.coursePicture} />
@@ -133,7 +132,12 @@ export default function Lesson() {
           <></>
         )}
       </main>
-      <Footer />
     </>
   );
 }
+
+import auth from "@/auth";
+
+export const getServerSideProps = async (context: any) => {
+  return auth.checkAuthenticated(context, false, "/signin");
+};

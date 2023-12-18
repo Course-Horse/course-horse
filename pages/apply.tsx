@@ -1,12 +1,11 @@
 import Head from "next/head";
 
 import auth from "@/auth/";
-import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 import TextInputList from "@/components/textInputList/textInputList";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
+import NavBar from "@/components/navbar/navbar";
 
-export default function Apply() {
+export default function Apply({ username }: { username: any }) {
   return (
     <>
       <Head>
@@ -16,7 +15,7 @@ export default function Apply() {
           content="Apply to become an educator on Course Horse."
         />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <h1>Apply</h1>
         <form method="POST" className={verticalFormStyles.form}>
@@ -40,7 +39,6 @@ export default function Apply() {
           </div>
         </form>
       </main>
-      <Footer />
     </>
   );
 }

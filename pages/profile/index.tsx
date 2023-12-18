@@ -1,5 +1,3 @@
-import { useSession } from "next-auth/react";
-import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import $ from "jquery";
@@ -8,13 +6,10 @@ import axios from "axios";
 import validator from "@/data/helpers/validator.js";
 import auth from "@/auth/";
 import styles from "@/styles/profile.module.scss";
-import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 import { Spinner } from "react-bootstrap";
+import NavBar from "@/components/navbar/navbar";
 
-export default function MyProfile() {
-  const { data: session } = useSession();
-
+export default function MyProfile({ username }: { username: any }) {
   const [loading, setLoading] = useState(true);
   const [loadingPic, setLoadingPic] = useState(false);
   const [loadingPersonal, setLoadingPersonal] = useState(false);
@@ -23,7 +18,7 @@ export default function MyProfile() {
 
   useEffect(() => {
     axios
-      .get(`/api/users/?method=GET`)
+      .get(`/api/users/`)
       .then((res) => {
         setData(res.data);
         setLoading(false);
@@ -40,7 +35,7 @@ export default function MyProfile() {
 
   async function submitProfilePicture(e: any) {
     e.preventDefault();
-    axios.get(`/api/users/${session?.user?.name}`);
+    axios.get(`/api/users/${session.username}`);
   }
 
   async function submitPersonal(e: any) {
@@ -62,9 +57,12 @@ export default function MyProfile() {
 
     // MAKE REQUEST
     axios
-      .get(
-        `/api/users/${session.user.name}?method=POST&updateType=personal&email=${email}&firstName=${firstName}&lastName=${lastName}`
-      )
+      .post(`/api/users/${username}`, {
+        updateType: "personal",
+        firstName,
+        lastName,
+        email,
+      })
       .then((res) => {
         window.location.href = "/profile";
       })
@@ -93,9 +91,10 @@ export default function MyProfile() {
 
     // MAKE REQUEST
     axios
-      .get(
-        `/api/users/${session.user.name}?method=POST&updateType=password&password=${password}`
-      )
+      .post(`/api/users/${username}`, {
+        updateType: "password",
+        password,
+      })
       .then((res) => {
         window.location.href = "/profile";
       })
@@ -109,7 +108,19 @@ export default function MyProfile() {
 
   async function signoutHandler(e: any) {
     e.preventDefault();
-    const result = await signOut({ callbackUrl: "/" });
+    axios
+      .get(`/api/signout/`)
+      .then((res) => {
+        window.location.href = "/signin";
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response && err.response.data) {
+          alert(err.response.data.error);
+        } else {
+          alert("error occurred please try again");
+        }
+      });
   }
 
   return (
@@ -118,7 +129,7 @@ export default function MyProfile() {
         <title>My Profile | Course Horse</title>
         <meta name="description" content="View your profile on Course Horse." />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <h1>My Profile {loading ? <Spinner /> : null}</h1>
 
@@ -187,7 +198,6 @@ export default function MyProfile() {
 
         <button onClick={signoutHandler}>Sign Out</button>
       </main>
-      <Footer />
     </>
   );
 }
