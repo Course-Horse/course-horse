@@ -9,6 +9,7 @@ export default async function handler(
 ) {
   const method = req.method;
   const session = await auth.getSession({ req, res });
+  console.log("HIT");
 
   if (!session.username)
     return res
@@ -18,7 +19,24 @@ export default async function handler(
   switch (method) {
     // GET LIST OF COURSES
     case "GET":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
+      let courses;
+      let thisTitle = req.query.title;
+      let thisSortBy = req.query.sortBy;
+      let thisSortOrder = req.query.sortOrder === "desc" ? false : true;
+      let thisTags =
+        req.query.tags !== undefined ? JSON.parse(req.query.tags) : undefined;
+
+      try {
+        courses = await courseData.getCourses(
+          thisTitle,
+          thisSortBy,
+          thisSortOrder,
+          thisTags
+        );
+      } catch (e) {
+        return res.status(500).json({ error: e });
+      }
+      return res.status(200).json(courses.splice(0, 20));
 
     // CREATE COURSE
     case "POST":

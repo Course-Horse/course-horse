@@ -8,13 +8,20 @@
   > form {
     margin: 5px;
     display: flex;
-    flex-direction: row;
-    gap: 20px;
+    flex-direction: column;
+    gap: 5px;
 
     > div {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      gap: 10px;
       margin: 0;
+      > div {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        align-items: center;
+      }
     }
   }
 

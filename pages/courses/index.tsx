@@ -1,26 +1,79 @@
 import Head from "next/head";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import $ from "jquery";
 
 import auth from "@/auth/";
 import styles from "@/styles/courses.module.scss";
 import CourseList from "@/components/courseList/courselist";
 import NavBar from "@/components/navbar/navbar";
 
-const dummyCourses = [
-  {
-    id: 1,
-    name: "Course 1",
-    description: "Course 1 Description",
-    image: "/favicon.ico",
-  },
-  {
-    id: 2,
-    name: "Course 2",
-    description: "Course 2 Description",
-    image: "/favicon.ico",
-  },
-];
+const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
 
 export default function Courses({ username }: { username: any }) {
+  const [loadingMyCourses, setLoadingMyCourses] = useState(true);
+  const [myCourses, setMyCourses] = useState([]);
+  const [loadingBrowse, setLoadingBrowse] = useState(true);
+  const [Browse, setBrowse] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/courses/mycourses")
+      .then((res) => {
+        console.log(res.data);
+        setMyCourses(res.data);
+        setLoadingMyCourses(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .get("/api/courses")
+      .then((res) => {
+        console.log(res.data);
+        setBrowse(res.data);
+        setLoadingBrowse(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  function searchCourses(e: any) {
+    e.preventDefault();
+
+    let title = $("#title").val();
+    let sortBy = $("#sortBy").val();
+    let sortOrder = $("#sortOrder").val();
+    let tags = $("#tags div input");
+    let tagList = [];
+    for (let tag of tags) {
+      if (tag.checked) {
+        tagList.push(tag.value);
+      }
+    }
+
+    console.log(title, sortBy, sortOrder, tagList);
+
+    axios
+      .get("/api/courses/", {
+        params: {
+          title,
+          sortBy,
+          sortOrder,
+          tags: JSON.stringify(tagList),
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setBrowse(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   return (
     <>
       <Head>
@@ -33,43 +86,78 @@ export default function Courses({ username }: { username: any }) {
         <div className={styles.courseListingWrapper}>
           <div>
             <h2>My Courses</h2>
-            <CourseList courses={dummyCourses} />
+            {loadingMyCourses ? (
+              <p>Loading...</p>
+            ) : myCourses.creator.length > 0 ? (
+              <CourseList courses={myCourses.creator} />
+            ) : (
+              <p>You've made no courses.</p>
+            )}
           </div>
           <div>
             <h2>Enrolled Courses</h2>
-            <CourseList courses={dummyCourses} />
+            {loadingMyCourses ? (
+              <p>Loading...</p>
+            ) : myCourses.enrolled.length > 0 ? (
+              <CourseList courses={myCourses.enrolled} />
+            ) : (
+              <p>No enrolled courses.</p>
+            )}
           </div>
           <div className={styles.browse}>
-            <h2>Browse Other Courses</h2>
-            <form>
+            <h2>All Courses</h2>
+            <form onSubmit={searchCourses}>
               <div>
-                <label htmlFor="title">Course Title</label>
-                <input id="title" type="text" placeholder="Title" />
+                <div>
+                  <label htmlFor="title">Course Title</label>
+                  <input id="title" type="text" placeholder="Title" />
+                </div>
+                <div>
+                  <label htmlFor="sortBy">Sort By</label>
+                  <select id="sortBy">
+                    <option value="title">Title</option>
+                    <option value="date">Date</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="sortOrder">Sort Order</label>
+                  <select id="sortOrder">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="submit">Submit</label>
+                  <button id="submit" type="submit">
+                    Search
+                  </button>
+                </div>
               </div>
-              <div>
-                <label htmlFor="sortBy">Sort By</label>
-                <select id="sortBy">
-                  <option value="title">Title</option>
-                  <option value="date">Date</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="sortOrder">Sort Order</label>
-                <select id="sortOrder">
-                  <option value="asc">Ascending</option>
-                  <option value="desc">Descending</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="submit">Submit</label>
-                <button id="submit" type="submit">
-                  Search
-                </button>
+              <div id="tags">
+                {TAGS.map((tag) => {
+                  let lower = tag.toLocaleLowerCase();
+                  return (
+                    <div key={tag}>
+                      <input
+                        type="checkbox"
+                        id={lower}
+                        name={lower}
+                        value={lower}
+                      />
+                      <label htmlFor={lower}>{tag}</label>
+                    </div>
+                  );
+                })}
               </div>
             </form>
             <div>
-              <CourseList courses={dummyCourses} />
-              <button>Load More</button>
+              {loadingBrowse ? (
+                <p>Loading...</p>
+              ) : Browse.length > 0 ? (
+                <CourseList courses={Browse} />
+              ) : (
+                <p>No courses found.</p>
+              )}
             </div>
           </div>
         </div>
