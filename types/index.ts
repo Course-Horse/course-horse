@@ -30,7 +30,7 @@ export interface UserUpdate {
 
 export interface Course {
     _id: string; // course ObjectId()
-    creator: string; // user ObjectId()
+    creator: string; // username
     title: string;
     description: string;
     coursePicture: string; // begins with "data:image/"

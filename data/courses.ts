@@ -28,6 +28,23 @@ const methods = {
   },
 
   /**
+   * Gets all courses made by a specific username
+   * @param {string} username of user to get all made courses for
+   * @returns {Promise} Promise object that resolves to an array of course objects
+   */
+  async getCoursesCreatedBy(username: string): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // return all courses created by specified username
+    const coursesCollection = await courses();
+    const coursesCreatedByUser = await coursesCollection
+      .find({ creator: username })
+      .toArray();
+    return coursesCreatedByUser;
+  },
+
+  /**
    * Creates a new course in database
    * @param {string} username
    * @param {string} title
@@ -44,7 +61,7 @@ const methods = {
     tags: string[]
   ) {
     // validate username and check if user is a valid educator
-    username = validator.checkUsername(username, "educatorId");
+    username = validator.checkUsername(username, "username");
     let user = (await userData.getUser(username)) as User;
     if (
       !(user.application && user.application.status === "accepted") &&
@@ -53,15 +70,21 @@ const methods = {
       throw "user must be an educator to create a course";
     }
 
-    // validate other fields
+    // validate title
     title = validator.checkString(title, "title");
+
+    // validate description
     description = validator.checkString(description, "description");
+
+    // validate coursePicture
     coursePicture = validator.checkImage(coursePicture, "coursePicture");
+
+    // validate tags
     tags = validator.checkStringArray(tags, "tags");
 
     // create course object
     let course = {
-      educatorId: username,
+      creator: username,
       title: title,
       description: description,
       coursePicture: coursePicture,
@@ -143,6 +166,11 @@ const methods = {
     }
 
     // remove courseId from all user's enrolledCourses
+    const usersCollection = await users();
+    await usersCollection.updateMany(
+      { enrolledCourses: id },
+      { $pull: { enrolledCourses: id } }
+    );
 
     // delete course from database using mongo helper functions
     let deleted_course = (await mongo.deleteDocById(
