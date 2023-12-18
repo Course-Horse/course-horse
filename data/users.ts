@@ -251,7 +251,7 @@ const methods = {
     usernameQuery?: string,
     sortBy?: string,
     sortOrder?: boolean,
-    statusFilter?: [string]
+    statusFilter?: string[]
   ): Promise<any> {
     const query: any = {};
     const sortOptions: any = {};
@@ -290,7 +290,7 @@ const methods = {
    * Creates a new application for a user
    * @param {string} username of the user to create an application for
    * @param {string} content of the application
-   * @param {[string]} documents array of document links
+   * @param {string[]} documents array of document links
    * @returns {Promise} Promise object that resolves to a user object
    */
   async createApplication(
