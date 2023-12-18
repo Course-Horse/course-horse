@@ -155,17 +155,16 @@ async function deleteDocById(collectionGetter, id, docType) {
  */
 async function replaceDocById(collectionGetter, id, replacement, docType) {
   id = checkId(id, "id");
-
   let collection = await collectionGetter();
   let updatedInfo = await collection.findOneAndUpdate(
     { _id: new ObjectId(id) },
     { $set: replacement },
     { returnDocument: "after" }
   );
-  if (updatedInfo.lastErrorObject.n === 0) {
-    throw `could not update ${docType} successfully`;
-  }
-  return updatedInfo.value;
+  // if (updatedInfo.lastErrorObject.n === 0) {
+  //   throw `could not update ${docType} successfully`;
+  // }
+  return updatedInfo;
 }
 
 export {

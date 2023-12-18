@@ -137,18 +137,18 @@ const methods = {
     }
 
     // validate first name
-    if (fields.hasOwnProperty("email")) {
-      new_user.email = validator.checkEmail(fields.email);
+    if (fields.hasOwnProperty("firstName")) {
+      new_user.firstName = validator.checkName(fields.firstName);
     }
 
     // validate last name
-    if (fields.hasOwnProperty("email")) {
-      new_user.email = validator.checkEmail(fields.email);
+    if (fields.hasOwnProperty("lastName")) {
+      new_user.lastName = validator.checkName(fields.lastName);
     }
 
     // validate bio
-    if (fields.hasOwnProperty("email")) {
-      new_user.email = validator.checkEmail(fields.email);
+    if (fields.hasOwnProperty("bio")) {
+      new_user.bio = validator.checkString(fields.bio);
     }
 
     // validate password and encrypt with specified salt rounds
@@ -160,8 +160,12 @@ const methods = {
     }
 
     // update user in database using mongo helper functions
-    let result = (await mongo.replaceDocById(users, new_user._id, new_user, "user")) as User;
-    delete result.password;
+    let result = (await mongo.replaceDocById(
+      users,
+      new_user._id.toString(),
+      new_user,
+      "user"
+    )) as User;
     return result;
   },
 
