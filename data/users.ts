@@ -19,7 +19,10 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async getUser(username: string): Promise<any> {
-    // TODO: validate username
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // get user from database using mongo helper functions
     let user = (await mongo.getDocByParam(
       users,
       "username",
@@ -128,6 +131,9 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async updateUser(username: string, fields: UserUpdate): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
     // retrive user from database
     let new_user = (await mongo.getDocByParam(
       users,
@@ -181,7 +187,29 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async setProfilePicture(username: string, picture: string): Promise<any> {
-    return "IMPLEMENT ME";
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrive user from database
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // validate picture
+    picture = validator.checkImage(picture, "picture");
+
+    // update user with supplied profile picture
+    user.profilePicture = picture;
+    let result = (await mongo.replaceDocById(
+      users,
+      user._id.toString(),
+      user,
+      "user"
+    )) as User;
+    return result;
   },
 
   /**
@@ -190,24 +218,72 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async deleteUser(username: string): Promise<any> {
-    return "IMPLEMENT ME";
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrieve user to be deleted
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // delete user from database using mongo helper functions
+    let deleted_user = (await mongo.deleteDocById(
+      users,
+      user._id.toString(),
+      "user"
+    )) as User;
+    delete deleted_user.password;
+    return deleted_user;
   },
 
   /**
    * Gets an array of applications
-   * @param {string} usernameQuery string to filter the username by
-   * @param {string} sortBy field to sort by, one of: created, username
-   * @param {boolean} sortOrder true for ascending, false for descending
-   * @param {[string]} statusFilter array of statuses to filter by
+   * @param {string} usernameQuery string to filter the username by [username]
+   * @param {string} sortBy [created, username]
+   * @param {boolean} sortOrder [true: ascending, false: descending]
+   * @param {string[]} statusFilter array of statuses to filter by [approved, declined, pending]
    * @returns {Promise} Promise object that resolves to an array of all applications
    */
   async getApplications(
-    usernameQuery: string,
-    sortBy: string,
-    sortOrder: boolean,
-    statusFilter: [string]
+    usernameQuery?: string,
+    sortBy?: string,
+    sortOrder?: boolean,
+    statusFilter?: [string]
   ): Promise<any> {
-    return "IMPLEMENT ME";
+    const query: any = {};
+    const sortOptions: any = {};
+
+    // filter by usernameQuery if provided
+    if (usernameQuery) {
+      query.username = { $regex: new RegExp(usernameQuery, "i") };
+    }
+
+    // filter by application status if provided
+    if (statusFilter && statusFilter.length > 0) {
+      query["application.status"] = { $in: statusFilter };
+    }
+
+    // set sortBy and sortOrder parameters if provided
+    if (sortBy === "created") {
+      sortOptions["application.created"] = sortOrder ? 1 : -1;
+    } else if (sortBy === "username") {
+      sortOptions.username = sortOrder ? 1 : -1;
+    }
+
+    // query and sort data from the database
+    const usersCollection = await users();
+    const usersWithApplications = await usersCollection
+      .find(query)
+      .sort(sortOptions)
+      .toArray();
+    const applications = usersWithApplications.map(
+      (user: User) => user.application
+    );
+
+    return applications;
   },
 
   /**
@@ -220,9 +296,41 @@ const methods = {
   async createApplication(
     username: string,
     content: string,
-    documents: [string]
+    documents: string[]
   ): Promise<any> {
-    return "IMPLEMENT ME";
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrieve user to add application to
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // validate content
+    content = validator.checkString(content, "content");
+
+    // validate documents
+    documents = validator.checkLinkStringArray(documents, "documents");
+
+    let application = {
+      status: "Pending",
+      created: new Date(),
+      content: content,
+      documents: documents,
+    };
+
+    // update user with application
+    user.application = application;
+    let result = (await mongo.replaceDocById(
+      users,
+      user._id.toString(),
+      user,
+      "user"
+    )) as User;
+    return result;
   },
 
   /**
@@ -232,7 +340,33 @@ const methods = {
    * @returns {Promise} Promise object that resolves to a user object
    */
   async setApplicationStatus(username: string, status: string): Promise<any> {
-    return "IMPLEMENT ME";
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrieve user to change application status of
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // validate status
+    status = validator.checkStatus(status, "status");
+
+    // check if user has an application
+    if (user.application === null)
+      throw `${username} does not have an application`;
+
+    // update user's application status and update the database
+    user.application.status = status;
+    let result = (await mongo.replaceDocById(
+      users,
+      user._id.toString(),
+      user,
+      "user"
+    )) as User;
+    return result;
   },
 };
 

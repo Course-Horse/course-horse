@@ -10,6 +10,19 @@ const exportedMethods = {
     return strVal;
   },
 
+  checkStatus(strVal, varName) {
+    if (!strVal) throw `You must supply a ${varName}!`;
+    if (typeof strVal !== "string") throw `${varName} must be a string!`;
+    strVal = strVal.trim();
+    if (strVal.length === 0)
+      throw `${varName} cannot be an empty string or string with just spaces`;
+    if (!isNaN(strVal))
+      throw `${strVal} is not a valid value for ${varName} as it only contains digits`;
+    if (!strVal in ["pending", "accepted", "declined"])
+      throw `${strVal} is not a valid value for ${varName}, must be in ["pending", "accepted", "declined"]`;
+    return strVal;
+  },
+
   checkStringArray(arr, varName) {
     if (!arr || !Array.isArray(arr))
       throw `You must provide an array of ${varName}`;
@@ -33,6 +46,23 @@ const exportedMethods = {
         !arr[i].trim().startsWith("https://www.youtube.com/embed/")
       ) {
         throw `One or more elements in ${varName} array is not a string or is an empty string or does not start with "https://www.youtube.com/embed/"`;
+      }
+      arr[i] = arr[i].trim();
+    }
+
+    return arr;
+  },
+
+  checkLinkStringArray(arr, varName) {
+    if (!arr || !Array.isArray(arr))
+      throw `You must provide an array of ${varName}`;
+    for (let i in arr) {
+      if (
+        typeof arr[i] !== "string" ||
+        arr[i].trim().length === 0 ||
+        !arr[i].trim().startsWith("https://")
+      ) {
+        throw `One or more elements in ${varName} array is not a string or is an empty string or does not start with "https://"`;
       }
       arr[i] = arr[i].trim();
     }
