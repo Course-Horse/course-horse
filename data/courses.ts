@@ -5,12 +5,47 @@ import { lessonData, userData } from "@/data";
 
 const methods = {
   /**
-   * Gets an array of all courses
-   * @returns {Promise} Promise object that resolves to an array of all courses
+   * Gets an array of courses
+   * @param {string} title string to filter the courses by [title]
+   * @param {string} sortBy [created, title]
+   * @param {boolean} sortOrder [true: ascending, false: descending]
+   * @param {string[]} tagsFilter array of tags to filter by
+   * @returns {Promise} Promise object that resolves to an array of courses
    */
-  async getCourses(): Promise<any> {
-    let result = await mongo.getAllDocs(courses);
-    return result;
+  async getCourses(
+    title?: string,
+    sortBy?: string,
+    sortOrder?: boolean,
+    tags?: string[]
+  ): Promise<Course[]> {
+    const query: any = {};
+    const sortOptions: any = {};
+
+    // filter by title if provided
+    if (title) {
+      query.title = { $regex: new RegExp(title, "i") };
+    }
+
+    // filter by tags if provided
+    if (tags && tags.length > 0) {
+      query["tags"] = { $in: tags };
+    }
+
+    // set sortBy and sortOrder parameters if provided
+    if (sortBy === "created") {
+      sortOptions["created"] = sortOrder ? 1 : -1;
+    } else if (sortBy === "title") {
+      sortOptions.title = sortOrder ? 1 : -1;
+    }
+
+    // query and sort data from the database
+    const coursesCollection = await courses();
+    const coursesList = await coursesCollection
+      .find(query)
+      .sort(sortOptions)
+      .toArray();
+
+    return coursesList;
   },
 
   /**
@@ -32,7 +67,7 @@ const methods = {
    * @param {string} username of user to get all made courses for
    * @returns {Promise} Promise object that resolves to an array of course objects
    */
-  async getCoursesCreatedBy(username: string): Promise<any> {
+  async getCoursesCreatedByUsername(username: string): Promise<any> {
     // validate username
     username = validator.checkUsername(username, "username");
 
