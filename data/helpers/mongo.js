@@ -108,7 +108,7 @@ async function createDoc(collectionGetter, doc, docType) {
   let collection = await collectionGetter();
   let insertInfo = await collection.insertOne(doc);
   if (!insertInfo["acknowledged"] || !insertInfo["insertedId"])
-    throw `could not add ${docType}r`;
+    throw `could not add ${docType}`;
 
   let newId = insertInfo[["insertedId"]].toString();
   doc = await getDocById(collectionGetter, newId, docType);

@@ -11,12 +11,12 @@ import Footer from "@/components/footer/footer";
 export default function Register() {
   function submitHandler(e: any) {
     e.preventDefault();
+
     let username = $("#username").val();
     let password = $("#password").val();
     let email = $("#email").val();
     let firstName = $("#firstName").val();
     let lastName = $("#lastName").val();
-    let type = $("#type").val();
 
     axios
       .post("/api/users", {
@@ -25,14 +25,17 @@ export default function Register() {
         email: email,
         firstName: firstName,
         lastName: lastName,
-        type: type,
       })
       .then((res) => {
         console.log(res);
         window.location.href = "/signin";
       })
       .catch((err) => {
-        alert(err);
+        if (err.response && err.response.data) {
+          alert(err.response.data.error);
+        } else {
+          alert("error occurred please try again");
+        }
       });
   }
 
