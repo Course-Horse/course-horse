@@ -1,7 +1,7 @@
 import { users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
 import { User, UserUpdate } from "@/types";
-import bcrypt from "bcrypt";
+const bcrypt = require("bcrypt");
 
 const methods = {
   /**
@@ -20,7 +20,12 @@ const methods = {
    */
   async getUser(username: string): Promise<any> {
     // TODO: validate username
-    let user = await mongo.getDocByParam(users, "username", username, "user");
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
     delete user.password;
     return user;
   },
@@ -102,7 +107,7 @@ const methods = {
       email: email,
       firstName: firstName,
       lastName: lastName,
-      profilePicture: "",
+      profilePicture: "/default_profile.jpeg",
       bio: "",
       created: new Date(),
       admin: false,
