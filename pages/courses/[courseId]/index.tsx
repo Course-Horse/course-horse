@@ -5,7 +5,6 @@ import { Button } from "react-bootstrap";
 import headerStyle from "@/styles/header.module.scss";
 import styles from "@/styles/course.module.scss";
 import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 
 const DUMMY = {
   // _id: ObjectId,
@@ -87,7 +86,7 @@ function LessonPreview({
   );
 }
 
-export default function Course() {
+export default function Course({ username }: { username: any }) {
   const router = useRouter();
   const { courseId } = router.query;
   let data = DUMMY;
@@ -98,7 +97,7 @@ export default function Course() {
         <title>Course | Course Horse</title>
         <meta name="description" content="View a course on Course Horse." />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <div className={headerStyle.header}>
           <img src={data.coursePicture} />
@@ -123,7 +122,12 @@ export default function Course() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }
+
+import auth from "@/auth/";
+
+export const getServerSideProps = async (context: any) => {
+  return auth.checkAuthenticated(context, false, "/signin");
+};

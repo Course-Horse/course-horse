@@ -3,10 +3,9 @@ import Head from "next/head";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 import TextInputList from "@/components/textInputList/textInputList";
 
-export default function CreateLesson() {
+export default function CreateLesson({ username }: { username: any }) {
   function createLesson() {}
 
   return (
@@ -15,7 +14,7 @@ export default function CreateLesson() {
         <title>Create Lesson | Course Horse</title>
         <meta name="description" content="Create a Lesson on Course Horse." />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <h1>Create Lesson</h1>
         <form method="POST" className={verticalFormStyles.form}>
@@ -44,7 +43,6 @@ export default function CreateLesson() {
           </div>
         </form>
       </main>
-      <Footer />
     </>
   );
 }

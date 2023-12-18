@@ -1,7 +1,16 @@
-import { getSession } from "next-auth/react";
+import { getIronSession } from "iron-session";
 import { userData } from "@/data";
 
 const exportedMethods = {
+  async getSession(context: any) {
+    const session = await getIronSession(context.req, context.res, {
+      password: "TFj9LX2JJKBHMdiam9N9eUryQNxD72Lh",
+      cookieName: "special-cookie",
+    });
+
+    return session;
+  },
+
   /**
    * Checks if the user is authenticated or not
    * @param context of the page
@@ -14,9 +23,10 @@ const exportedMethods = {
     isAuth: boolean = false,
     redirect: string = "/signin"
   ) {
-    const session = await getSession(context);
+    const session = await this.getSession(context);
+    let username = session.username;
 
-    if ((!session && !isAuth) || (session && isAuth)) {
+    if ((!username && !isAuth) || (username && isAuth)) {
       return {
         redirect: {
           destination: redirect,
@@ -25,8 +35,11 @@ const exportedMethods = {
       };
     }
 
+    let result = {};
+    if (username) result.username = username;
+
     return {
-      props: { session },
+      props: result,
     };
   },
 
@@ -37,8 +50,12 @@ const exportedMethods = {
    * @returns redirect object if user is not an admin
    */
   async checkAdmin(context: any, redirect: string = "/profile") {
-    const session = await getSession(context);
-    if (!session)
+    const session = await this.getSession(context);
+    let username = session.username;
+    let result = {};
+    if (username) result.username = username;
+
+    if (!username)
       return {
         redirect: {
           destination: "/signin",
@@ -46,7 +63,7 @@ const exportedMethods = {
         },
       };
 
-    const user = await userData.getUser(session.user.name);
+    const user = await userData.getUser(username);
     if (user.admin !== true)
       return {
         redirect: {
@@ -56,7 +73,7 @@ const exportedMethods = {
       };
 
     return {
-      props: { session },
+      props: result,
     };
   },
 
@@ -72,8 +89,12 @@ const exportedMethods = {
     has: boolean = true,
     redirect: string = "/profile"
   ) {
-    const session = await getSession(context);
-    if (!session)
+    const session = await this.getSession(context);
+    let username = session.username;
+    let result = {};
+    if (username) result.username = username;
+
+    if (!username)
       return {
         redirect: {
           destination: "/signin",
@@ -81,23 +102,23 @@ const exportedMethods = {
         },
       };
 
-    const user = await userData.getUser(session.user.name);
+    const user = await userData.getUser(username);
     if (user.admin === true)
       return {
-        props: { session },
+        props: result,
       };
 
     if (has)
       if (user.application !== null && user.application.status === "approved")
         return {
-          props: { session },
+          props: result,
         };
       else if (
         user.application === null ||
         user.application.status !== "approved"
       )
         return {
-          props: { session },
+          props: result,
         };
 
     return {

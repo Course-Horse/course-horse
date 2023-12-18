@@ -1,17 +1,16 @@
 import Link from "next/link";
 import Head from "next/head";
+import { useState } from "react";
 import axios from "axios";
 import $ from "jquery";
-import { useState } from "react";
 import { Spinner } from "react-bootstrap";
-import validator from "@/data/helpers/validator.js";
 
-import styles from "@/styles/signup.module.scss";
 import auth from "@/auth/";
+import validator from "@/data/helpers/validator.js";
+import styles from "@/styles/signup.module.scss";
 import NavBar from "@/components/navbar/navbar";
-import Footer from "@/components/footer/footer";
 
-export default function Register() {
+export default function Register({ username }: { username: any }) {
   const [loading, setLoading] = useState(false);
 
   function submitHandler(e: any) {
@@ -67,7 +66,7 @@ export default function Register() {
           content="Sign up for a Course Horse account."
         />
       </Head>
-      <NavBar />
+      <NavBar username={username} />
       <main className="pageContainer">
         <div className={styles.signinContainer}>
           <h1>Sign Up</h1>
@@ -106,7 +105,6 @@ export default function Register() {
           </form>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

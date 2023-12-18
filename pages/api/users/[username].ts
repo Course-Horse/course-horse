@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/react";
 
+import auth from "@/auth";
 import { validator } from "@/data/helpers";
 import { userData } from "@/data";
 
@@ -8,83 +8,78 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  const method = req.query.method;
-  if (method === null)
-    return res.status(400).json({ error: "No method specified" });
+  const method = req.method;
+  const session = await auth.getSession({ req, res });
+  console.log(session);
 
-  const session = await getSession({ req });
+  switch (method) {
+    case "GET":
+      // GET PUBLIC USER DATA
+      return res.status(200).json({ TODO: "TODO" });
+    case "POST":
+      // UPDATE USER DATA
+      // check if user authorized to update the user
+      if (session.username !== req.query.username)
+        return res
+          .status(403)
+          .json({ error: "You cannot update another user." });
 
-  if (method === "GET") {
-    return res.status(200).json({ TODO: "TODO" });
-  }
+      // get type of update
+      const updateType = req.body.updateType;
 
-  if (method === "POST") {
-    // check if user is actually the right user
-    if (session.user?.name !== req.query.username)
-      return res.status(403).json({ error: "You cannot update another user." });
+      let result;
+      switch (updateType) {
+        case "personal":
+          // get and validate input data
+          let firstName = req.body.firstName;
+          let lastName = req.body.lastName;
+          let email = req.body.email;
+          try {
+            firstName = validator.checkName(firstName, "firstName");
+            lastName = validator.checkName(lastName, "lastName");
+            email = validator.checkEmail(email, "email");
+          } catch (e) {
+            return res.status(400).json({ error: e });
+          }
 
-    // get type of update
-    let updateType = req.query.updateType;
-    if (
-      !updateType ||
-      !["personal", "password", "picture"].includes(updateType)
-    )
+          // attempt to update user
+          try {
+            result = await userData.updateUser(session.username, {
+              firstName,
+              lastName,
+              email,
+            });
+            delete result.password;
+          } catch (e) {
+            return res.status(500).json({ error: e });
+          }
+          return res.status(200).json(result);
+
+        case "password":
+          // get and validate input data
+          let password = req.body.password;
+          try {
+            password = validator.checkPassword(password, "password");
+          } catch (e) {
+            return res.status(400).json({ error: e });
+          }
+
+          // attempt to update user
+          try {
+            result = await userData.updateUser(session.username, { password });
+            delete result.password;
+          } catch (e) {
+            return res.status(500).json({ error: e });
+          }
+          return res.status(200).json(result);
+
+        case "picture":
+          return res.status(501).json({ error: "Not implemented" });
+      }
       return res.status(400).json({ error: "Invalid update type" });
-
-    let result;
-    // update personal info
-    if (updateType === "personal") {
-      let firstName = req.query.firstName;
-      let lastName = req.query.lastName;
-      let email = req.query.email;
-      try {
-        firstName = validator.checkName(firstName, "firstName");
-        lastName = validator.checkName(lastName, "lastName");
-        email = validator.checkEmail(email, "email");
-      } catch (e) {
-        return res.status(400).json({ error: e });
-      }
-
-      try {
-        result = await userData.updateUser(session.user.name, {
-          firstName,
-          lastName,
-          email,
-        });
-        delete result.password;
-      } catch (e) {
-        return res.status(500).json({ error: e });
-      }
-    }
-
-    // update password
-    if (updateType === "password") {
-      let password = req.query.password;
-      try {
-        password = validator.checkPassword(password, "password");
-      } catch (e) {
-        return res.status(400).json({ error: e });
-      }
-
-      try {
-        result = await userData.updateUser(session.user.name, { password });
-        delete result.password;
-      } catch (e) {
-        return res.status(500).json({ error: e });
-      }
-    }
-
-    // update picture
-    if (updateType === "picture") {
-      // let picture = req.query.picture;
-      console.log(req.body);
-    }
-
-    return res.status(200).json(result);
   }
-  res.status(200).json({ TODO: "TODO" });
 
   return res
     .status(404)
-    .json({ error: `${req.method} method is not supported on this route.` });
+    .json({ error: `${method} method is not supported on this route.` });
 }
