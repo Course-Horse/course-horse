@@ -37,8 +37,8 @@ export default nextauth({
   pages: {
     signIn: "/signin",
   },
-  secret: "test",
+  secret: "idontknowwhatiswrongwiththisthing",
   jwt: {
-    secret: "test",
+    secret: "idontknowwhatiswrongwiththisthing",
   },
 });

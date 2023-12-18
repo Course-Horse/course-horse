@@ -40,13 +40,9 @@ export default function Register() {
     }
 
     axios
-      .post("/api/users", {
-        username: username,
-        password: password,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-      })
+      .get(
+        `/api/users?method=POST&username=${username}&password=${password}&email=${email}&firstName=${firstName}&lastName=${lastName}`
+      )
       .then((res) => {
         console.log(res);
         window.location.href = "/signin";
