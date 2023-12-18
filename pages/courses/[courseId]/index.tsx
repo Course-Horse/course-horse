@@ -84,16 +84,20 @@ export default function Course({ username }: { username: any }) {
             <div className={styles.lessonList}>
               <h2>Lessons</h2>
               <div>
-                {data.lessons.map((lesson, index) => {
-                  return (
-                    <LessonPreview
-                      key={index}
-                      courseId={courseId}
-                      num={index}
-                      data={lesson}
-                    />
-                  );
-                })}
+                {data.lessons.length === 0 ? (
+                  <h3>No Lessons Available</h3>
+                ) : (
+                  data.lessons.map((lesson, index) => {
+                    return (
+                      <LessonPreview
+                        key={index}
+                        courseId={courseId}
+                        num={index}
+                        data={lesson}
+                      />
+                    );
+                  })
+                )}
               </div>
             </div>
           </>

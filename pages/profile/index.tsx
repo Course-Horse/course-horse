@@ -35,7 +35,45 @@ export default function MyProfile({ username }: { username: any }) {
 
   async function submitProfilePicture(e: any) {
     e.preventDefault();
-    axios.get(`/api/users/${session.username}`);
+    let profilePicture = $("#profilePicture")[0];
+    if (!profilePicture.files || !profilePicture.files[0]) {
+      alert("You must provide a course image!");
+      return;
+    }
+    let reader = new FileReader();
+    reader.onload = function (e) {
+      profilePicture = reader.result;
+      console.log(profilePicture);
+
+      try {
+        profilePicture = validator.checkImage(
+          profilePicture,
+          "Profile Picture"
+        );
+      } catch (e) {
+        alert(e);
+        return;
+      }
+
+      axios
+        .post(`/api/users/${username}`, {
+          updateType: "picture",
+          profilePicture,
+        })
+        .then((res) => {
+          console.log(res);
+          window.location.href = "/profile/";
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response && err.response.data) {
+            alert(err.response.data.error);
+          } else {
+            alert("error occurred please try again");
+          }
+        });
+    };
+    reader.readAsDataURL(profilePicture.files[0]);
   }
 
   async function submitPersonal(e: any) {

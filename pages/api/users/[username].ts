@@ -73,9 +73,27 @@ export default async function handler(
           }
           return res.status(200).json(result);
 
-        // TODO: implement picture update
         case "picture":
-          return res.status(501).json({ error: "Not implemented" });
+          let profilePicture = req.body.profilePicture;
+          try {
+            profilePicture = validator.checkImage(
+              profilePicture,
+              "profilePicture"
+            );
+          } catch (e) {
+            return res.status(400).json({ error: e });
+          }
+
+          try {
+            result = await userData.setProfilePicture(
+              session.username,
+              profilePicture
+            );
+          } catch (e) {
+            return res.status(500).json({ error: e });
+          }
+
+          return res.status(200).json(result);
       }
       return res.status(400).json({ error: "Invalid update type" });
   }
