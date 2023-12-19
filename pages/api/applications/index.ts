@@ -15,6 +15,7 @@ export default async function handler(
       .status(401)
       .json({ error: "You must be signed in to interact with discussions." });
 
+  // api functions
   const method = req.method;
   if (method === "GET") {
     let { usernameQuery, sortBy, sortOrder, statusFilter } = req.query;
@@ -70,13 +71,13 @@ export default async function handler(
   }
 
   if (method === "POST") {
-    // retrieve and validate parameters
-    let { content, documents } = req.body;
-    content = validator.checkString(content, "content");
-    documents = validator.checkLinkStringArray(documents, "documents");
-
-    // make call to backend
     try {
+      // retrieve and validate parameters
+      let { content, documents } = req.body;
+      content = validator.checkString(content, "content");
+      documents = validator.checkLinkStringArray(documents, "documents");
+
+      // make call to backend
       let result = await userData.createApplication(
         session.username,
         content,
