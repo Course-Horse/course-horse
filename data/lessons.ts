@@ -22,6 +22,50 @@ const methods = {
   },
 
   /**
+   * Grade a specific quiz against a set of submitted answers
+   * @param {string} lessonId of the lesson that contains quiz to be graded
+   * @param {string} answers the submitted array of answer indices
+   * @returns {Promise<string[]>} Promise object that resolves to a boolean
+   */
+  async gradeQuiz(lessonId: string, answers: number[]): Promise<boolean> {
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve specified lesson from the database
+    let lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lesson"
+    )) as Lesson;
+
+    // check if a quiz exists for the specified lesson
+    if (!lesson.quiz || !lesson.quiz.questions) {
+      throw "Quiz not found in lesson";
+    }
+
+    // create correct answers array
+    const correctAnswers = lesson.quiz.questions.map(
+      (question) => question.correctAnswer
+    );
+
+    // make sure number of submitted answers matches number of questions
+    if(correctAnswers.length !== answers.length){
+      throw "incorrect number of answers submitted"
+    }
+
+    // calculate score
+    let score = 0;
+    for (let i = 0; i < correctAnswers.length; i++) {
+      if (answers[i] === correctAnswers[i]) {
+        score++;
+      }
+    }
+    score /= correctAnswers.length;
+
+    return score > 0.6;
+  },
+
+  /**
    * Gets a lesson with a specific id
    * @param {string} lessonId of the lesson to retrieve
    * @returns {Promise<Lesson>} Promise object that resolves to a lesson object
@@ -287,7 +331,10 @@ const methods = {
 
     // validate videos
     if (fields.hasOwnProperty("videos")) {
-      new_lesson.videos = validator.checkVideoStringArray(fields.videos, "videos");
+      new_lesson.videos = validator.checkVideoStringArray(
+        fields.videos,
+        "videos"
+      );
     }
 
     // validate quiz
