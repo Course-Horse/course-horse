@@ -61,6 +61,19 @@ export default function Course({ username }: { username: any }) {
     }
   }, []);
 
+  function deleteCourse() {
+    axios
+      .delete(`/api/courses/${courseId}`)
+      .then((res) => {
+        alert("Course deleted.");
+        window.location.href = "/courses";
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Unable to delete course.");
+      });
+  }
+
   return (
     <>
       <Head>
@@ -82,7 +95,7 @@ export default function Course({ username }: { username: any }) {
                 <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
                 {data.creator !== username ? null : (
-                  <Button href={`/courses/${courseId}/create`} variant="danger">
+                  <Button onClick={deleteCourse} variant="danger">
                     Delete Course
                   </Button>
                 )}

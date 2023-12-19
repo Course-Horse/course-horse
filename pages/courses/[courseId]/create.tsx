@@ -76,10 +76,9 @@ export default function CreateLesson({ username }: { username: any }) {
       description = validator.checkString(description, "Lesson Description");
       content = validator.checkString(content, "Lesson Content");
       videoList = validator.checkVideoStringArray(videoList, "Youtube Links");
-      quizDescription = validator.checkString(
-        quizDescription,
-        "Quiz Description"
-      );
+      if (hasQuiz) {
+        quizDescription = validator.checkString(quizDescription);
+      }
     } catch (e) {
       alert(e);
       return;

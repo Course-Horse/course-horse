@@ -120,14 +120,15 @@ const methods = {
     // retrieve parent course
     let parent_course = (await mongo.getDocById(
       courses,
-      lesson.courseId,
+      lesson.courseId.toString(),
       "course"
     )) as Course;
 
     // remove lessonId from course's lessons array and update in the database
     parent_course.lessons = parent_course.lessons.filter(
-      (id) => id !== lessonId
+      (id) => id.toString() !== lessonId
     );
+
     await mongo.replaceDocById(
       courses,
       parent_course._id.toString(),

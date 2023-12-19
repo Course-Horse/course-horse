@@ -44,7 +44,7 @@ export default async function handler(
 
       let quiz_obj = undefined;
       try {
-        if (quizDescription && quiz) {
+        if (quizDescription && quiz && quiz.length > 0) {
           quizDescription = validator.checkString(
             quizDescription,
             "quizDescription"
@@ -58,13 +58,13 @@ export default async function handler(
               quiz[i].answers,
               `quiz[${i}].answers`
             );
-            quiz[i].correct = validator.checkInt(
-              quiz[i].correct,
-              `quiz[${i}].correct`
+            quiz[i].correctAnswer = validator.checkInt(
+              quiz[i].correctAnswer,
+              `quiz[${i}].correctAnswer`
             );
             if (
-              quiz[i].correct < 0 ||
-              quiz[i].correct >= quiz[i].answers.length
+              quiz[i].correctAnswer < 0 ||
+              quiz[i].correctAnswer >= quiz[i].answers.length
             )
               throw `a correct answer must be within bounds of the answers array`;
           }

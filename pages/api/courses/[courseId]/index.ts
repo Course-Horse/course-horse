@@ -92,7 +92,19 @@ export default async function handler(
 
     // DELETE COURSE
     case "DELETE":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
+      if (session.username !== course.creator)
+        return res
+          .status(401)
+          .json({ error: "You must be the creator to delete a course." });
+
+      try {
+        await courseData.deleteCourse(courseId);
+      } catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: e });
+      }
+
+      return res.status(200).json({ success: `Course deleted.` });
   }
 
   return res
