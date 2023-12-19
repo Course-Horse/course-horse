@@ -3,29 +3,50 @@ import { mongo, validator } from "@/data/helpers/index.ts";
 import { Quiz, Lesson, Course, User } from "@/types";
 
 const methods = {
-  async getLessons(courseId: string) {
-    return "IMPLEMENT ME";
+  /**
+   * Retrieve all lessons for a specific course
+   * @param {string} courseId of the course to retrieve lessons from
+   * @returns {Promise<string[]>} Promise object that resolves to an array of lessonId strings
+   */
+  async getLessons(courseId: string): Promise<string[]> {
+    // validate courseId and retrieve parent course
+    courseId = mongo.checkId(courseId, "courseId");
+    let parent_course = (await mongo.getDocById(
+      courses,
+      courseId,
+      "course"
+    )) as Course;
+
+    // return lessons
+    return parent_course.lessons;
   },
 
-  async getLesson(lessonId: string) {
+  /**
+   * Gets a lesson with a specific id
+   * @param {string} lessonId of the lesson to retrieve
+   * @returns {Promise<Lesson>} Promise object that resolves to a lesson object
+   */
+  async getLesson(lessonId: string): Promise<Lesson> {
+    // validate lessonId
     lessonId = mongo.checkId(lessonId, "lessonId");
 
+    // retrieve lesson from the database
     let result = (await mongo.getDocById(
       lessons,
       lessonId,
       "lesson"
     )) as Lesson;
-
     return result;
   },
 
   /**
    * Creates a new lesson for a course in the database
-   * @param {string} educatorId
+   * @param {string} courseId
    * @param {string} title
    * @param {string} description
-   * @param {string} coursePicture
-   * @param {string[]} tags
+   * @param {string} content
+   * @param {string[]} videos
+   * @param {Quiz} quiz
    * @returns {Promise} Promise object that resolves to a course object
    */
   async createLesson(
@@ -82,8 +103,45 @@ const methods = {
     return result;
   },
 
-  async deleteLesson(lessonId: string) {
-    return "IMPLEMENT ME";
+  /**
+   * Deletes a lesson with a specific id
+   * @param {string} lessonId of the lesson to delete
+   * @returns {Promise<Lesson>} Promise object that resolves into a lesson object
+   */
+  async deleteLesson(lessonId: string): Promise<Lesson> {
+    // validate lessonId and retrieve lesson
+    lessonId = mongo.checkId(lessonId, "lessonId");
+    let lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lesson"
+    )) as Lesson;
+
+    // retrieve parent course
+    let parent_course = (await mongo.getDocById(
+      courses,
+      lesson.courseId,
+      "course"
+    )) as Course;
+
+    // remove lessonId from course's lessons array and update in the database
+    parent_course.lessons = parent_course.lessons.filter(
+      (id) => id !== lessonId
+    );
+    await mongo.replaceDocById(
+      courses,
+      parent_course._id.toString(),
+      parent_course,
+      "course"
+    );
+
+    // delete lesson from the database
+    let result = (await mongo.deleteDocById(
+      lessons,
+      lessonId,
+      "lessonId"
+    )) as Lesson;
+    return result;
   },
 };
 

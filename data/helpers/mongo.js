@@ -161,9 +161,9 @@ async function replaceDocById(collectionGetter, id, replacement, docType) {
     { $set: replacement },
     { returnDocument: "after" }
   );
-  // if (updatedInfo.lastErrorObject.n === 0) {
-  //   throw `could not update ${docType} successfully`;
-  // }
+  if (!updatedInfo) {
+    throw `could not update ${docType} successfully`;
+  }
   return updatedInfo;
 }
 
