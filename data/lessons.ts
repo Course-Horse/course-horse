@@ -143,6 +143,47 @@ const methods = {
     )) as Lesson;
     return result;
   },
+
+  /**
+   * Toggles a user's username in a lesson's viewed array
+   * @param {string} username of the user
+   * @param {string} lessonId id of the lesson
+   * @returns {Promise} Promise object that resolves to a lesson object
+   */
+  async toggleViewedUsername(username: string, lessonId: string): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // confirm user exists in the database
+    await mongo.getDocByParam(users, "username", username, "user");
+
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve lesson with supplied lessonId
+    let lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lessonId"
+    )) as Lesson;
+
+    // toggles a user's username in a lesson's viewed array
+    const userIndex = lesson.viewed.indexOf(username);
+    if (userIndex > -1) {
+      lesson.viewed.splice(userIndex, 1);
+    } else {
+      lesson.viewed.push(username);
+    }
+
+    // update lesson with toggled viewed array
+    let result = (await mongo.replaceDocById(
+      lessons,
+      lesson._id.toString(),
+      lesson,
+      "lesson"
+    )) as Lesson;
+    return result;
+  },
 };
 
 export default methods;
