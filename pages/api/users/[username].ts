@@ -10,12 +10,34 @@ export default async function handler(
 ) {
   const method = req.method;
   const session = (await auth.getSession({ req, res })) as any;
-  console.log(session);
+  if (!session.username)
+    return res
+      .status(401)
+      .json({ error: "You must be signed in to interact with users." });
 
   switch (method) {
     case "GET":
       // GET PUBLIC USER DATA
-      return res.status(200).json({ TODO: "TODO" });
+      let username = req.query.username as string;
+      try {
+        username = validator.checkUsername(username, "username");
+      } catch (e) {
+        res.status(400).json({ error: e });
+      }
+
+      let user;
+      try {
+        user = await userData.getUser(username);
+      } catch (e) {
+        return res.status(404).json({ error: e });
+      }
+      return res.status(200).json({
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profilePicture: user.profilePicture,
+      });
     case "POST":
       // UPDATE USER DATA
       // check if user authorized to update the user
