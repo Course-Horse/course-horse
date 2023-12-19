@@ -309,7 +309,7 @@ const methods = {
    * @param {string} sortBy [created, username]
    * @param {boolean} sortOrder [true: ascending, false: descending]
    * @param {string[]} statusFilter array of statuses to filter by [approved, declined, pending]
-   * @returns {Promise} Promise object that resolves to an array of all applications
+   * @returns {Promise} Promise object that resolves to an array of all users with specified application
    */
   async getApplications(
     usernameQuery?: string,
@@ -320,12 +320,14 @@ const methods = {
     const query: any = {};
     const sortOptions: any = {};
 
-    // filter by usernameQuery if provided
+    // validate and filter by usernameQuery if provided
+    usernameQuery = validator.checkString(usernameQuery, "usernameQuery");
     if (usernameQuery) {
       query.username = { $regex: new RegExp(usernameQuery, "i") };
     }
 
-    // filter by application status if provided
+    // validate and filter by application status if provided
+    statusFilter = validator.checkStringArray(statusFilter, "statusFilter");
     if (statusFilter && statusFilter.length > 0) {
       query["application.status"] = { $in: statusFilter };
     }
@@ -339,15 +341,14 @@ const methods = {
 
     // query and sort data from the database
     const usersCollection = await users();
-    const usersWithApplications = await usersCollection
+    const usersWithApplications = (await usersCollection
       .find(query)
       .sort(sortOptions)
-      .toArray();
-    const applications = usersWithApplications.map(
-      (user: User) => user.application
+      .toArray()) as User[];
+    const usersWithoutPasswords = usersWithApplications.map(
+      ({ password, ...rest }) => rest
     );
-
-    return applications;
+    return usersWithoutPasswords;
   },
 
   /**
