@@ -321,16 +321,15 @@ const methods = {
     const sortOptions: any = {};
 
     // validate and filter by usernameQuery if provided
-    usernameQuery = validator.checkString(usernameQuery, "usernameQuery");
     if (usernameQuery) {
-      query.username = { $regex: new RegExp(usernameQuery, "i") };
+      usernameQuery = validator.checkString(usernameQuery, "usernameQuery");
+      query.username = { $regex: new RegExp(usernameQuery as any, "i") };
     }
 
     // validate and filter by application status if provided
+    if (!statusFilter) statusFilter = ["pending", "accepted", "rejected"];
     statusFilter = validator.checkStringArray(statusFilter, "statusFilter");
-    if (statusFilter && statusFilter.length > 0) {
-      query["application.status"] = { $in: statusFilter };
-    }
+    query["application.status"] = { $in: statusFilter };
 
     // set sortBy and sortOrder parameters if provided
     if (sortBy === "created") {

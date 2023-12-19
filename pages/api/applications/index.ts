@@ -9,51 +9,59 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await auth.getSession({ req });
+  const session = await auth.getSession({ req, res });
 
   if (method === "GET") {
     let { usernameQuery, sortBy, sortOrder, statusFilter } = req.query;
     let applicationParams: QueryParams = {};
 
-    // validate usernameQuery
-    if (usernameQuery) {
-      applicationParams.usernameQuery = validator.checkString(
-        usernameQuery,
-        "usernameQuery"
-      );
+    // validate user inputs
+    try {
+      if (usernameQuery) {
+        applicationParams.usernameQuery = validator.checkString(
+          usernameQuery,
+          "usernameQuery"
+        );
+      }
+      if (sortBy) {
+        applicationParams.sortBy = validator.checkSortByApplication(
+          sortBy,
+          "sortBy"
+        );
+      }
+      if (sortOrder) {
+        let resultOrder = validator.checkSortOrder(sortOrder, "sortOrder");
+        applicationParams.sortOrder = resultOrder === "asc" ? true : false;
+      }
+      if (statusFilter) {
+        applicationParams.statusFilter = validator.checkStringArray(
+          JSON.parse(statusFilter as any),
+          "statusFilter"
+        );
+        if (applicationParams.statusFilter.length === 0) {
+          delete applicationParams.statusFilter;
+        }
+      }
+    } catch (e) {
+      return res.status(400).json({ error: e });
     }
 
-    // validate sortBy
-    if (sortBy) {
-      applicationParams.sortBy = validator.checkSortByApplication(sortBy, "sortBy");
-    }
-
-    // validate sortOrder
-    if (sortOrder) {
-      let resultOrder = validator.checkSortOrder(sortOrder, "sortOrder");
-      applicationParams.sortOrder = resultOrder === "asc" ? true : false;
-    }
-
-    // validate statusFilter
-    if (statusFilter) {
-      applicationParams.statusFilter = validator.checkStringArray(
-        statusFilter,
-        "statusFilter"
-      );
-    }
+    console.log(applicationParams);
 
     // make call to backend
+    let result;
     try {
-      let result = await userData.getApplications(
+      result = await userData.getApplications(
         applicationParams.usernameQuery,
         applicationParams.sortBy,
         applicationParams.sortOrder,
         applicationParams.statusFilter
       );
-      return res.status(200).json({ users: result });
     } catch (e) {
       return res.status(500).json({ error: e });
     }
+
+    return res.status(200).json({ users: result });
   }
 
   if (method === "POST") {

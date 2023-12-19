@@ -3,14 +3,18 @@ import axios from "axios";
 import auth from "@/auth/";
 import validator from "@/data/helpers/validator.js";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
+import { useEffect, useState } from "react";
 import NavBar from "@/components/navbar/navbar";
 import styles from "@/styles/admin.module.scss";
 import $ from "jquery";
+import Link from "next/link";
+import { Spinner } from "react-bootstrap";
 
 export default function Admin({ username }: { username: any }) {
-  function searchApplications(e: any) {
-    e.preventDefault();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]) as any;
 
+  function searchApplications() {
     let usernameQ = $("#usernameQ").val();
     let sortBy = $("#sortBy").val();
     let sortOrder = $("#sortOrder").val();
@@ -24,21 +28,32 @@ export default function Admin({ username }: { username: any }) {
 
     console.log(usernameQ, sortBy, sortOrder, statusList);
 
-    // axios
-    //   .get("/api/applications/", {
-    //     params: {
-    //       username: usernameQ,
-    //       sortBy,
-    //       sortOrder,
-    //       statuses: JSON.stringify(statusList),
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res.data);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    axios
+      .get("/api/applications/", {
+        params: {
+          usernameQuery: usernameQ,
+          sortBy,
+          sortOrder,
+          statusFilter: JSON.stringify(statusList),
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setData(res.data.users);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    searchApplications();
+  }, []);
+
+  function searchApplicationsHandler(e: any) {
+    e.preventDefault();
+    searchApplications();
   }
 
   return (
@@ -51,7 +66,7 @@ export default function Admin({ username }: { username: any }) {
       <main className="pageContainer">
         <h1>Browse Applications</h1>
         <div className={styles.browse}>
-          <form onSubmit={searchApplications}>
+          <form onSubmit={searchApplicationsHandler}>
             <div>
               <div>
                 <label htmlFor="usernameQ">Username</label>
@@ -95,7 +110,41 @@ export default function Admin({ username }: { username: any }) {
               })}
             </div>
           </form>
-          <div>results</div>
+
+          {loading ? (
+            <Spinner />
+          ) : (
+            <div className={styles.applicationList}>
+              {data.map((application: any, index: number) => {
+                return (
+                  <Link href={`/admin/${application.username}`}>
+                    <div
+                      style={{
+                        backgroundColor:
+                          application.application === null ||
+                          application.application.status === "pending"
+                            ? "var(--bs-gray-200)"
+                            : application.application.status === "accepted"
+                            ? "#a8ffbf"
+                            : "#ffb7a3",
+                      }}
+                    >
+                      <img src={application.profilePicture} />
+                      <div>
+                        <p>
+                          {application.username} |{" "}
+                          {application.application === null
+                            ? "No Application"
+                            : application.application.status}
+                        </p>
+                        <p>{application.email}</p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </main>
     </>

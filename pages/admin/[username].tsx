@@ -1,5 +1,5 @@
 import Head from "next/head";
-
+import { useEffect, useState } from "react";
 import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
 import styles from "@/styles/admin.module.scss";
@@ -8,6 +8,8 @@ import { useParams } from "next/navigation";
 
 export default function AdminView({ username }: { username: any }) {
   const { username: usernameQ } = useParams();
+
+  useEffect(() => {}, []);
 
   return (
     <>
