@@ -20,69 +20,69 @@ export default async function handler(
   try {
     user = (await userData.getUser(session.username)) as User;
   } catch (e) {
-    return res.status(404).json({ error: "User not found." });
+    return res.status(500).json({ error: "Unable to get session user data." });
+  }
+
+  let usernameToChange = req.query.username;
+  try {
+    usernameToChange = validator.checkUsername(
+      usernameToChange,
+      "usernameToChange"
+    ) as string;
+  } catch (e) {
+    return res.status(400).json({ error: e });
   }
 
   const method = req.method;
-  // changes a user's application status, session user must be admin
+  // CHANGE APPLICATION STATUS (session user must be admin)
   if (method === "POST") {
+    // get and validate user inputs
+    let { status } = req.body;
     try {
-      // validate parameters
-      let { status } = req.body;
       status = validator.checkStatus(status, "status");
-      let usernameToChange = req.query.username;
-      usernameToChange = validator.checkUsername(
-        usernameToChange,
-        "usernameToChange"
-      ) as string;
+    } catch (e) {
+      return res.status(400).json({ error: e });
+    }
 
-      // validate current session user is an admin
-      if (!user.admin) {
-        return res
-          .status(403)
-          .json({
-            error: "You must be an admin to change application statuses",
-          });
-      }
+    // check if session user is an admin
+    if (!user.admin) {
+      return res.status(403).json({
+        error: "You must be an admin to change application statuses",
+      });
+    }
 
-      // make call to backend
-      let result = await userData.setApplicationStatus(
-        usernameToChange,
-        status
-      );
-      return res.status(200).json({ user: result });
+    // attempt to change application status
+    let result;
+    try {
+      result = await userData.setApplicationStatus(usernameToChange, status);
     } catch (e) {
       return res.status(500).json({ error: e });
     }
+
+    // return updated user
+    return res.status(200).json({ user: result });
   }
 
-  // set a user's application back to null
+  // DELETE AN APPLICATION (session user must be admin or specified user)
   if (method === "DELETE") {
+    // check if session user is an admin or the specified user
+    if (!(user.admin || user.username === usernameToChange)) {
+      return res.status(403).json({
+        error:
+          "You must be an admin or the specified user to delete application",
+      });
+    }
+
+    // attempt to delete application
+    let result;
     try {
-      // validate parameters
-      let usernameToChange = req.query.username;
-      usernameToChange = validator.checkUsername(
-        usernameToChange,
-        "usernameToChange"
-      ) as string;
-
-      // validate current session user is an admin or specified user
-      if (!(user.admin || user.username === usernameToChange)) {
-        return res
-          .status(403)
-          .json({
-            error: "You must be an admin or the specified user to delete application",
-          });
-      }
-
-      // make call to backend
-      let result = await userData.deleteApplication(
-        usernameToChange
-      );
-      return res.status(200).json({ user: result });
+      result = await userData.deleteApplication(usernameToChange);
     } catch (e) {
       return res.status(500).json({ error: e });
     }
+
+    // return updated user
+    return res.status(200).json({ user: result });
   }
 
   return res
