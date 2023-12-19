@@ -1,6 +1,6 @@
 import { lessons, courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-import { Quiz, Lesson, Course, User, LessonUpdate } from "@/types";
+import { Quiz, Lesson, Course, User, LessonUpdate, Message } from "@/types";
 
 const methods = {
   /**
@@ -49,8 +49,8 @@ const methods = {
     );
 
     // make sure number of submitted answers matches number of questions
-    if(correctAnswers.length !== answers.length){
-      throw "incorrect number of answers submitted"
+    if (correctAnswers.length !== answers.length) {
+      throw "incorrect number of answers submitted";
     }
 
     // calculate score
@@ -350,6 +350,65 @@ const methods = {
       "lesson"
     )) as Lesson;
     return result;
+  },
+
+  /**
+   * Creates a message in a specified lesson's discussion
+   * @param {string} lessonId of the lesson with discussion to add to
+   * @param {string} username of the user creating the message
+   * @param {string} message of the message
+   * @returns {Promise} Promise object that resolves to an array of message objects
+   */
+  async createMessage(
+    lessonId: string,
+    username: string,
+    message: string
+  ): Promise<Message[]> {
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve lesson from the database
+    let new_lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lessonId"
+    )) as Lesson;
+
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // confirm user exists in the database
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // confirm user is enrolled in the course
+    if (!user.enrolledCourses.includes(new_lesson.courseId)) {
+      throw "user not enrolled in course";
+    }
+
+    // validate message
+    message = validator.checkString(message, "message");
+
+    // create message object to be added
+    let message_obj: Message = {
+      username: username,
+      message: message,
+      created: new Date()
+    };
+
+    // update lesson with new discussion
+    new_lesson.discussion.push(message_obj);
+    let updated_lesson = (await mongo.replaceDocById(
+      lessons,
+      new_lesson._id.toString(),
+      new_lesson,
+      "lesson"
+    )) as Lesson;
+    return updated_lesson.discussion;
   },
 };
 
