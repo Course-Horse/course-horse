@@ -10,7 +10,7 @@ export interface User {
   created: Date;
   admin: boolean;
   enrolledCourses: string[];
-  application: Application;
+  application: Application | null;
 }
 
 export interface Application {
