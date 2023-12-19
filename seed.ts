@@ -374,7 +374,6 @@ async function seeding(){
     );
 
     await userData.toggleEnrollment('janeDoe123', advancedPythonProgramming._id.toString());
-    await userData.toggleEnrollment('johnSmith456', advancedPythonProgramming._id.toString());
     
     await lessonData.toggleQuizCompletedUsers(
         'janeDoe123',
@@ -383,11 +382,6 @@ async function seeding(){
     
     await lessonData.deleteLesson(
         webDevLesson1._id.toString()
-    );
-    
-    await lessonData.toggleViewedUsername(
-        'johnSmith456',
-        pythonLesson2._id.toString()
     );
 
     await lessonData.updateLesson(
@@ -500,11 +494,13 @@ async function seeding(){
 
     await lessonData.toggleViewedUsername('xxmistacruzxx', pythonLesson1._id.toString());
     await lessonData.toggleViewedUsername('alextaylor789', pythonLesson1._id.toString());
+    await lessonData.toggleViewedUsername('janedoe123', pythonLesson1._id.toString());
     await lessonData.toggleViewedUsername('xxmistacruzxx', pythonLesson2._id.toString());
     await lessonData.toggleViewedUsername('janedoe123', pythonLesson2._id.toString());
     await lessonData.toggleViewedUsername('janedoe123', javascriptEssentialsLesson1._id.toString());
     await lessonData.toggleViewedUsername('johnsmith456', javascriptEssentialsLesson1._id.toString());
     await lessonData.toggleViewedUsername('johnsmith456', javascriptEssentialsLesson2._id.toString());
+    await lessonData.toggleViewedUsername('janeDoe123', javascriptEssentialsLesson2._id.toString());
     await lessonData.toggleViewedUsername('alextaylor789', pythonLesson2._id.toString());
     await lessonData.toggleViewedUsername('alextaylor789', pythonLesson2._id.toString());
 
