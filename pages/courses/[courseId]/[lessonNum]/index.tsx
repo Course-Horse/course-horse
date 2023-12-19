@@ -7,6 +7,8 @@ import { Button, Spinner } from "react-bootstrap";
 import styles from "@/styles/lesson.module.scss";
 import headerStyles from "@/styles/header.module.scss";
 import NavBar from "@/components/navbar/navbar";
+import { parse } from "marked";
+import * as DOMPurify from "dompurify";
 
 function YTEmbed({ link }: { link: string }) {
   return (
@@ -111,9 +113,11 @@ export default function Lesson({ username }: { username: string }) {
             </div>
             <div className={styles.content}>
               <h3>Lesson Content</h3>
-              <div>
-                <p>{data.content}</p>
-              </div>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(parse(data.content) as any) as any,
+                }}
+              ></div>
             </div>
             {data.videos.length > 0 ? (
               <div className={styles.videos}>
