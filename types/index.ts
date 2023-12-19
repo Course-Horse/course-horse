@@ -59,6 +59,14 @@ export interface Lesson {
     discussion: Message[];
 }
 
+export interface LessonUpdate{
+    title?: string;
+    description?: string;
+    content?: string;
+    videos?: string[];
+    quiz?: Quiz;
+}
+
 export interface Quiz {
     description: string;
     questions: Question[];
