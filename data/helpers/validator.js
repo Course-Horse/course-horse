@@ -10,6 +10,17 @@ const exportedMethods = {
     return strVal;
   },
 
+  checkQuiz(quizVal, varName) {
+    if (!quizVal) throw `You must supply a ${varName}!`;
+    if (typeof quizVal.description !== "string")
+      throw `${varName} must have a string property 'description'!`;
+    if (!Array.isArray(quizVal.questions))
+      throw `${varName} must have an array property 'questions'!`;
+    if (!Array.isArray(quizVal.completed))
+      throw `${varName} must have an array property 'completed' with string elements!`;
+    return quizVal;
+  },
+
   checkStatus(strVal, varName) {
     if (!strVal) throw `You must supply a ${varName}!`;
     if (typeof strVal !== "string") throw `${varName} must be a string!`;
