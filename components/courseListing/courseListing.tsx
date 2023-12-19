@@ -4,7 +4,7 @@ export default function CourseListing({
   description,
   coursePicture,
   tags,
-}) {
+}: any) {
   return (
     <a href={`/courses/${_id}`}>
       <img src={coursePicture} alt={`${title} Course Image`} />

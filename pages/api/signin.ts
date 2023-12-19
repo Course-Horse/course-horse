@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  const session = await auth.getSession({ req, res });
+  const session = (await auth.getSession({ req, res })) as any;
   if (session.username)
     return res.status(401).json({ error: "You must be signed out to signin." });
 

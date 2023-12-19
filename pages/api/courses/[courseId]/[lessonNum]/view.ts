@@ -7,7 +7,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  const session = await auth.getSession({ req, res });
+  const session = (await auth.getSession({ req, res })) as any;
   if (!session.username)
     return res
       .status(401)
@@ -34,7 +34,7 @@ export default async function handler(
     return res.status(404).json({ error: "Course not found." });
   }
 
-  let lessonNum = req.query.lessonNum as string;
+  let lessonNum = req.query.lessonNum as any;
   lessonNum = Number(lessonNum);
   try {
     lessonNum = validator.checkInt(lessonNum, "lessonNum");

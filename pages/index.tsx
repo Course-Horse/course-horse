@@ -50,7 +50,7 @@ import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
 
 export async function getServerSideProps(context: any) {
-  const session = await auth.getSession(context);
+  const session = (await auth.getSession(context)) as any;
   let result = {};
   let username = session.username;
   if (username) result = { username };

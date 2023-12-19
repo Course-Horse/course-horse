@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await auth.getSession({ req, res });
+  const session = (await auth.getSession({ req, res })) as any;
   let courseId = req.query.courseId as string;
   if (!session.username)
     return res

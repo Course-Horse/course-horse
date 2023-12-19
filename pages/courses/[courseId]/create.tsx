@@ -15,7 +15,7 @@ import { Button } from "react-bootstrap";
 export default function CreateLesson({ username }: { username: any }) {
   const { courseId } = useParams();
   const [hasQuiz, setHasQuiz] = useState(false);
-  const [quiz, setQuiz] = useState([]);
+  const [quiz, setQuiz] = useState([]) as any;
 
   function toggleQuiz() {
     setHasQuiz(!hasQuiz);
@@ -34,7 +34,7 @@ export default function CreateLesson({ username }: { username: any }) {
     let title = $("#lessonName").val();
     let description = $("#lessonDescription").val();
     let content = $("#lessonContent").val();
-    let videos = $("#ytLinks input");
+    let videos = $("#ytLinks input") as any;
     let videoList = [];
     for (let video of videos) {
       if (video.value) {
@@ -45,11 +45,11 @@ export default function CreateLesson({ username }: { username: any }) {
     let quiz = null;
     let quizDescription = null;
     if (hasQuiz) {
-      let questions = $("#quiz > div");
+      let questions = $("#quiz > div") as any;
       let questionList = [];
       for (let question of questions) {
         let questionText = $(question).find("textarea").val();
-        let answers = $(question).find(".answers input");
+        let answers = $(question).find(".answers input") as any;
         let answerList = [];
         for (let answer of answers) {
           if (answer.value) {
@@ -156,7 +156,7 @@ export default function CreateLesson({ username }: { username: any }) {
             >
               {quiz.map((question: any, index: number) => {
                 return (
-                  <div>
+                  <div key={index}>
                     <h3>Question {index + 1}</h3>
                     <div>
                       <label htmlFor={`question${index}`}>

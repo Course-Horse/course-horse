@@ -12,7 +12,7 @@ const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
 
 export default function Courses({ username }: { username: any }) {
   const [loadingMyCourses, setLoadingMyCourses] = useState(true);
-  const [myCourses, setMyCourses] = useState([]);
+  const [myCourses, setMyCourses] = useState([]) as any;
   const [loadingBrowse, setLoadingBrowse] = useState(true);
   const [Browse, setBrowse] = useState([]);
 
@@ -46,7 +46,7 @@ export default function Courses({ username }: { username: any }) {
     let title = $("#title").val();
     let sortBy = $("#sortBy").val();
     let sortOrder = $("#sortOrder").val();
-    let tags = $("#tags div input");
+    let tags = $("#tags div input") as any;
     let tagList = [];
     for (let tag of tags) {
       if (tag.checked) {
@@ -89,7 +89,7 @@ export default function Courses({ username }: { username: any }) {
             ) : myCourses.creator.length > 0 ? (
               <CourseList courses={myCourses.creator} />
             ) : (
-              <p>You've made no courses.</p>
+              <p>You&apos;ve made no courses.</p>
             )}
           </div>
           <div>

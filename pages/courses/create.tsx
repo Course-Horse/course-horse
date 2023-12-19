@@ -13,7 +13,7 @@ export default function CreateCourse({ username }: { username: any }) {
   function submitCourse(e: any) {
     e.preventDefault();
 
-    let coursePicture = $("#courseImage")[0];
+    let coursePicture = $("#courseImage")[0] as any;
     if (!coursePicture.files || !coursePicture.files[0]) {
       alert("You must provide a course image!");
       return;
@@ -24,7 +24,7 @@ export default function CreateCourse({ username }: { username: any }) {
 
       let title = $("#courseName").val();
       let description = $("#courseDescription").val();
-      let tags = $("#tags div input");
+      let tags = $("#tags div input") as any;
       let tagList = [];
       for (let tag of tags) {
         if (tag.checked) {

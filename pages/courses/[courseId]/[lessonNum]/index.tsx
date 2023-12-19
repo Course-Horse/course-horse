@@ -27,7 +27,7 @@ export default function Lesson({ username }: { username: string }) {
   const { courseId, lessonNum } = router.query;
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null) as any;
   const [viewed, setViewed] = useState(null);
 
   useEffect(() => {
@@ -117,7 +117,7 @@ export default function Lesson({ username }: { username: string }) {
               <div className={styles.videos}>
                 <h3>Lesson Videos</h3>
                 <div>
-                  {data.videos.map((link, index) => {
+                  {data.videos.map((link: string, index: number) => {
                     return <YTEmbed key={`${index}_${link}`} link={link} />;
                   })}
                 </div>

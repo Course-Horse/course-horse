@@ -13,7 +13,7 @@ function LessonPreview({
   num,
   data,
 }: {
-  courseId: string;
+  courseId: any;
   num: number;
   data: any;
 }) {
@@ -43,7 +43,8 @@ export default function Course({ username }: { username: any }) {
   const router = useRouter();
   const { courseId } = router.query;
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null) as any;
+  const [enrolled, setEnrolled] = useState(null);
 
   useEffect(() => {
     if (courseId) {
@@ -52,6 +53,20 @@ export default function Course({ username }: { username: any }) {
         .then((res) => {
           console.log(res);
           setData(res.data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          alert("Unable to load course.");
+          window.location.href = "/courses";
+        });
+    }
+
+    if (courseId) {
+      axios
+        .get(`/api/courses/${courseId}/enroll`)
+        .then((res) => {
+          console.log(res);
+          setEnrolled(res.data.enrolled);
           setLoading(false);
         })
         .catch((err) => {
@@ -71,6 +86,18 @@ export default function Course({ username }: { username: any }) {
       .catch((err) => {
         console.log(err);
         alert("Unable to delete course.");
+      });
+  }
+
+  function toggleEnroll() {
+    axios
+      .post(`/api/courses/${courseId}/enroll`)
+      .then((res) => {
+        console.log(res.data.enrolled);
+        setEnrolled(res.data.enrolled);
+      })
+      .catch((err) => {
+        alert("Unable to enroll course.");
       });
   }
 
@@ -99,6 +126,16 @@ export default function Course({ username }: { username: any }) {
                     Delete Course
                   </Button>
                 )}
+                {data.creator === username ? null : enrolled === null ? (
+                  <Spinner />
+                ) : (
+                  <Button
+                    onClick={toggleEnroll}
+                    variant={enrolled ? "danger" : "primary"}
+                  >
+                    {enrolled ? "Unenroll" : "Enroll"}
+                  </Button>
+                )}
               </div>
             </div>
             <div className={styles.lessonList}>
@@ -115,7 +152,7 @@ export default function Course({ username }: { username: any }) {
                 {data.lessons.length === 0 ? (
                   <h3>No Lessons Available</h3>
                 ) : (
-                  data.lessons.map((lesson, index) => {
+                  data.lessons.map((lesson: any, index: number) => {
                     return (
                       <LessonPreview
                         key={index}
