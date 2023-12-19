@@ -1,6 +1,6 @@
 import { lessons, courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-import { Quiz, Lesson, Course, User } from "@/types";
+import { Quiz, Lesson, Course, User, LessonUpdate } from "@/types";
 
 const methods = {
   /**
@@ -156,7 +156,12 @@ const methods = {
     username = validator.checkUsername(username, "username");
 
     // confirm user exists in the database
-    await mongo.getDocByParam(users, "username", username, "user");
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
 
     // validate lessonId
     lessonId = mongo.checkId(lessonId, "lessonId");
@@ -167,6 +172,11 @@ const methods = {
       lessonId,
       "lessonId"
     )) as Lesson;
+
+    // confirm user is enrolled in the course
+    if (!user.enrolledCourses.includes(lesson.courseId)) {
+      throw "user not enrolled in course";
+    }
 
     // toggles a user's username in a lesson's viewed array
     const userIndex = lesson.viewed.indexOf(username);
@@ -181,6 +191,115 @@ const methods = {
       lessons,
       lesson._id.toString(),
       lesson,
+      "lesson"
+    )) as Lesson;
+    return result;
+  },
+
+  /**
+   * Toggles a user's username in a lesson's quiz completed usernames array
+   * @param {string} username of the user
+   * @param {string} lessonId id of the lesson
+   * @returns {Promise} Promise object that resolves to a lesson object
+   */
+  async toggleQuizCompletedUsers(
+    username: string,
+    lessonId: string
+  ): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // confirm user exists in the database
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve lesson with supplied lessonId
+    let lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lessonId"
+    )) as Lesson;
+
+    // confirm user is enrolled in the course
+    if (!user.enrolledCourses.includes(lesson.courseId)) {
+      throw "user not enrolled in course";
+    }
+
+    // toggles a user's username in a lesson's viewed array
+    const userIndex = lesson.quiz.completed.indexOf(username);
+    if (userIndex > -1) {
+      lesson.quiz.completed.splice(userIndex, 1);
+    } else {
+      lesson.quiz.completed.push(username);
+    }
+
+    // update lesson with toggled quiz completed array
+    let result = (await mongo.replaceDocById(
+      lessons,
+      lesson._id.toString(),
+      lesson,
+      "lesson"
+    )) as Lesson;
+    return result;
+  },
+
+  /**
+   * Updates a lesson
+   * @param {string} lessonId of the lesson to update
+   * @param {object} fields Object whos fields correspond to the fields to update
+   * @returns {Promise} Promise object that resolves to a lesson object
+   */
+  async updateLesson(lessonId: string, fields: LessonUpdate): Promise<Lesson> {
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve lesson with specified id from the database
+    let new_lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lessonId"
+    )) as Lesson;
+
+    // validate title
+    if (fields.hasOwnProperty("title")) {
+      new_lesson.title = validator.checkString(fields.title, "title");
+    }
+
+    // validate description
+    if (fields.hasOwnProperty("description")) {
+      new_lesson.description = validator.checkString(
+        fields.description,
+        "description"
+      );
+    }
+
+    // validate content
+    if (fields.hasOwnProperty("content")) {
+      new_lesson.content = validator.checkString(fields.content, "content");
+    }
+
+    // validate videos
+    if (fields.hasOwnProperty("videos")) {
+      new_lesson.videos = validator.checkVideoStringArray(fields.videos, "videos");
+    }
+
+    // validate quiz
+    if (fields.hasOwnProperty("quiz")) {
+      new_lesson.quiz = validator.checkQuiz(fields.quiz, "quiz");
+    }
+
+    // update lesson in the database using mongo helper functions
+    let result = (await mongo.replaceDocById(
+      lessons,
+      new_lesson._id.toString(),
+      new_lesson,
       "lesson"
     )) as Lesson;
     return result;
