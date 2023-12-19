@@ -1,4 +1,6 @@
 const exportedMethods = {
+  TAGS: ["math", "science", "english", "history", "art", "music", "other"],
+
   checkString(strVal, varName) {
     if (!strVal) throw `You must supply a ${varName}!`;
     if (typeof strVal !== "string") throw `${varName} must be a string!`;
@@ -144,6 +146,38 @@ const exportedMethods = {
     if (!image.startsWith("data:image/"))
       throw `${varName} must begin with 'data:image/'`;
     return image.trim();
+  },
+
+  checkSortByCourse(sortBy, varName) {
+    sortBy = this.checkString(sortBy, varName);
+    sortBy = sortBy.toLowerCase();
+    if (!["title", "created"].includes(sortBy))
+      throw `${varName} must be either 'title' or 'created'`;
+    return sortBy;
+  },
+
+  checkSortOrder(sortOrder, varName) {
+    sortOrder = this.checkString(sortOrder, varName);
+    sortOrder = sortOrder.toLowerCase();
+    if (!["asc", "desc"].includes(sortOrder))
+      throw `${varName} must be either 'asc' or 'desc'`;
+    return sortOrder;
+  },
+
+  checkTag(tag, varName) {
+    tag = this.checkString(tag, varName);
+    tag = tag.toLowerCase();
+    if (!this.TAGS.includes(tag))
+      throw `${varName} must be one of ${this.TAGS}`;
+    return tag;
+  },
+
+  checkTagList(tags, varName) {
+    tags = this.checkStringArray(tags, varName);
+    for (let i in tags) {
+      tags[i] = this.checkTag(tags[i], "tag");
+    }
+    return tags;
   },
 };
 

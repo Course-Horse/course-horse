@@ -57,7 +57,7 @@ export default function Quiz({ username }: { username: any }) {
       })
       .catch((err) => {
         console.log(err);
-        alert(err);
+        alert(err.response.data.error);
       });
   }
 
@@ -101,7 +101,7 @@ export default function Quiz({ username }: { username: any }) {
                   );
                 }
               )}
-              <div>
+              <div hidden={username === data.creator}>
                 <Button onClick={submitQuiz}>Submit Quiz</Button>
               </div>
             </form>

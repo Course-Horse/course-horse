@@ -24,7 +24,8 @@ export default function Discussion({ username }: { username: any }) {
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false);
+        alert(err.response.data.error);
+        window.location.href = `/courses/${courseId}`;
       });
   }, []);
 

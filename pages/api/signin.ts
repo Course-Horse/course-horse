@@ -9,37 +9,41 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const session = (await auth.getSession({ req, res })) as any;
-  if (session.username)
-    return res.status(401).json({ error: "You must be signed out to signin." });
-
   const method = req.method;
-  switch (method) {
-    case "POST":
-      // get and validate username and password
-      let username = req.body.username;
-      let password = req.body.password;
-      try {
-        username = validator.checkUsername(username, "username");
-        password = validator.checkPassword(password, "password");
-      } catch (e) {
-        return res.status(400).json({ error: e });
-      }
 
-      // attempt to authenticate user
-      let result;
-      try {
-        result = await userData.authUser(username, password);
-      } catch (e) {
-        return res.status(500).json({ error: e });
-      }
-
-      // save session and return
-      session.username = username;
-      await session.save();
+  if (method === "POST") {
+    // check if user is signed in
+    if (session.username)
       return res
-        .status(200)
-        .json({ message: `Successfully logged into ${username}.` });
+        .status(401)
+        .json({ error: "You must be signed out to signin." });
+
+    // get and validate username and password
+    let { username, password } = req.body;
+    try {
+      username = validator.checkUsername(username, "username");
+      password = validator.checkPassword(password, "password");
+    } catch (e) {
+      return res.status(400).json({ error: e });
+    }
+
+    // attempt to authenticate user
+    let result;
+    try {
+      result = await userData.authUser(username, password);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
+
+    // save session and return
+    session.username = username;
+    await session.save();
+    return res
+      .status(200)
+      .json({ message: `Successfully logged into ${username}.` });
   }
 
-  return res.status(404).json({ error: "Method not supported at this route." });
+  return res
+    .status(405)
+    .json({ error: `${method} method is not supported on this route.` });
 }

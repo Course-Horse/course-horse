@@ -42,7 +42,8 @@ export default function Lesson({ username }: { username: string }) {
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false);
+        alert(err.response.data.error);
+        window.location.href = `/courses/${courseId}`;
       });
 
     axios

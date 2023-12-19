@@ -71,7 +71,7 @@ export default function Course({ username }: { username: any }) {
             });
         });
     }
-  }, []);
+  }, [enrolled]);
 
   function deleteCourse() {
     axios
@@ -155,8 +155,10 @@ export default function Course({ username }: { username: any }) {
               </h2>
 
               <div>
-                {data.lessons.length === 0 ? (
-                  <h3>No Lessons Available</h3>
+                {data.lessons === undefined ? (
+                  <p>You must be enrolled to view lessons.</p>
+                ) : data.lessons.length === 0 ? (
+                  <p>No Lessons Available</p>
                 ) : (
                   data.lessons.map((lesson: any, index: number) => {
                     return (

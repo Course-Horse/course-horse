@@ -8,52 +8,44 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const session = (await auth.getSession({ req, res })) as any;
+  // check if user is signed in
   if (!session.username)
     return res
       .status(401)
-      .json({ error: "You must be logged in to create a course." });
-
-  let user;
-  try {
-    user = await userData.getUser(session.username);
-  } catch (e) {
-    return res.status(500).json({ error: e });
-  }
+      .json({ error: "You must be signed in to access this route." });
 
   const method = req.method;
-  let result;
-  switch (method) {
-    // GETS LIST OF YOUR CREATED AND ENROLLED COURSES
-    case "GET":
-      let enrolled;
-      try {
-        enrolled = await userData.getUser(session.username);
-        enrolled = enrolled.enrolledCourses;
-        for (let i = 0; i < enrolled.length; i++) {
-          enrolled[i] = await courseData.getCourse(enrolled[i].toString());
-        }
-      } catch (e) {
-        return res.status(500).json({ error: e });
+  // GET COURSES THE CURRENT SESSION USER CREATED AND IS ENROLLED IN
+  if (method === "GET") {
+    // get courses the user is enrolled in
+    let enrolled;
+    try {
+      enrolled = await userData.getUser(session.username);
+      enrolled = enrolled.enrolledCourses;
+      for (let i = 0; i < enrolled.length; i++) {
+        enrolled[i] = await courseData.getCourse(enrolled[i].toString());
       }
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
 
-      let creator;
-      try {
-        creator = await courseData.getCoursesCreatedByUsername(
-          session.username
-        );
-      } catch (e) {
-        return res.status(500).json({ error: e });
-      }
+    // get courses the user created
+    let creator;
+    try {
+      creator = await courseData.getCoursesCreatedByUsername(session.username);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
 
-      result = {
-        enrolled,
-        creator,
-      };
-
-      return res.status(200).json(result);
+    // return courses
+    let result = {
+      enrolled,
+      creator,
+    };
+    return res.status(200).json(result);
   }
 
   return res
-    .status(404)
-    .json({ error: `${req.method} method is not supported on this route.` });
+    .status(405)
+    .json({ error: `${method} method is not supported on this route.` });
 }
