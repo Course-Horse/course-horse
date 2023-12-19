@@ -483,6 +483,7 @@ async function seeding(){
     await userData.toggleEnrollment('xxmistacruzxx', advancedPythonProgramming._id.toString());
     await userData.toggleEnrollment('xxmistacruzxx', graphicDesignFundamentals._id.toString());
     await userData.toggleEnrollment('xxmistacruzxx', introToWebDevelopment._id.toString());
+    await userData.toggleEnrollment('xxmistacruzxx', javascriptEssentials._id.toString());
     await userData.toggleEnrollment('foobar554', introToWebDevelopment._id.toString());
     await userData.toggleEnrollment('foobar554', javascriptEssentials._id.toString());
     await userData.toggleEnrollment('janedoe123', javascriptEssentials._id.toString());
@@ -511,6 +512,14 @@ async function seeding(){
     await lessonData.toggleQuizCompletedUsers('johnsmith456', javascriptEssentialsLesson1._id.toString());
     await lessonData.toggleQuizCompletedUsers('johnsmith456', javascriptEssentialsLesson2._id.toString());
     await lessonData.toggleQuizCompletedUsers('alextaylor789', pythonLesson1._id.toString());
+
+    await lessonData.createMessage(pythonLesson1._id.toString(), 'xxmistacruzxx', "This lesson is goated fr fr");
+    await lessonData.createMessage(pythonLesson1._id.toString(), 'janedoe123', "This lesson made my brain hurt :(");
+    await lessonData.createMessage(pythonLesson2._id.toString(), 'janedoe123', "This lesson was much easier to follow than the first.");
+    await lessonData.createMessage(pythonLesson2._id.toString(), 'alextaylor789', "I give this lesson two thumbs down");
+    await lessonData.createMessage(javascriptEssentialsLesson1._id.toString(), 'johnsmith456', "This lesson made me rethink my self-worth");
+    await lessonData.createMessage(javascriptEssentialsLesson1._id.toString(), 'xxmistacruzxx', "This lesson is also goated fr fr");
+    await lessonData.createMessage(javascriptEssentialsLesson2._id.toString(), 'xxmistacruzxx', "This lesson is not goated. fr. fr.");
 }
 
 export default seeding
