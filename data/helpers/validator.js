@@ -18,7 +18,8 @@ const exportedMethods = {
       throw `${varName} cannot be an empty string or string with just spaces`;
     if (!isNaN(strVal))
       throw `${strVal} is not a valid value for ${varName} as it only contains digits`;
-    if (!strVal in ["pending", "accepted", "declined"])
+    strVal = strVal.toLowerCase();
+    if (!["pending", "accepted", "declined"].includes(strVal))
       throw `${strVal} is not a valid value for ${varName}, must be in ["pending", "accepted", "declined"]`;
     return strVal;
   },
