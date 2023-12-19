@@ -361,7 +361,7 @@ const methods = {
     username: string,
     content: string,
     documents: string[]
-  ): Promise<any> {
+  ): Promise<User> {
     // validate username
     username = validator.checkUsername(username, "username");
 
