@@ -54,8 +54,6 @@ export default function Courses({ username }: { username: any }) {
       }
     }
 
-    console.log(title, sortBy, sortOrder, tagList);
-
     axios
       .get("/api/courses/", {
         params: {
@@ -116,7 +114,7 @@ export default function Courses({ username }: { username: any }) {
                   <label htmlFor="sortBy">Sort By</label>
                   <select id="sortBy">
                     <option value="title">Title</option>
-                    <option value="date">Date</option>
+                    <option value="created">Created</option>
                   </select>
                 </div>
                 <div>

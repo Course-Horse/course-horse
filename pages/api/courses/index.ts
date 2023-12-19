@@ -9,12 +9,11 @@ export default async function handler(
 ) {
   const method = req.method;
   const session = await auth.getSession({ req, res });
-  console.log("HIT");
 
   if (!session.username)
     return res
       .status(401)
-      .json({ error: "You must be logged in to create a course." });
+      .json({ error: "You must be logged in to interact with courses." });
 
   switch (method) {
     // GET LIST OF COURSES

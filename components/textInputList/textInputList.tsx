@@ -17,7 +17,7 @@ export default function TextInputList({
   function addInput(e: any) {
     const element = (
       <>
-        <input type="text" placeholder="Link" />
+        <input type="text" />
         <Button
           variant="secondary"
           onClick={(e) => {

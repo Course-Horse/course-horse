@@ -78,18 +78,26 @@ export default function Course({ username }: { username: any }) {
             <div className={headerStyle.header}>
               <img src={data.coursePicture} />
               <div>
-                <h1>{data.title}</h1>
+                <h1>{data.title} </h1>
                 <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
+                {data.creator !== username ? null : (
+                  <Button href={`/courses/${courseId}/create`} variant="danger">
+                    Delete Course
+                  </Button>
+                )}
               </div>
             </div>
             <div className={styles.lessonList}>
-              <h2>Lessons </h2>
-              {data.creator !== username ? null : (
-                <Button href={`/courses/${courseId}/create`}>
-                  Create Lesson
-                </Button>
-              )}
+              <h2>
+                Lessons{" "}
+                {data.creator !== username ? null : (
+                  <Button href={`/courses/${courseId}/create`}>
+                    Create Lesson
+                  </Button>
+                )}
+              </h2>
+
               <div>
                 {data.lessons.length === 0 ? (
                   <h3>No Lessons Available</h3>
