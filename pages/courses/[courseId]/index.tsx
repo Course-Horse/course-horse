@@ -121,10 +121,19 @@ export default function Course({ username }: { username: any }) {
                 <h1>{data.title} </h1>
                 <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
+
                 {data.creator !== username ? null : (
-                  <Button onClick={deleteCourse} variant="danger">
-                    Delete Course
-                  </Button>
+                  <div>
+                    <Button
+                      variant="secondary"
+                      href={`/courses/${courseId}/edit`}
+                    >
+                      Edit Course
+                    </Button>
+                    <Button onClick={deleteCourse} variant="danger">
+                      Delete Course
+                    </Button>
+                  </div>
                 )}
                 {data.creator === username ? null : enrolled === null ? (
                   <Spinner />

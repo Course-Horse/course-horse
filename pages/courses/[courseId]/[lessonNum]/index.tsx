@@ -101,9 +101,11 @@ export default function Lesson({ username }: { username: string }) {
                 </h2>
                 <p>{data.description}</p>
                 {data.creator !== username ? null : (
-                  <Button onClick={deleteLesson} variant="danger">
-                    Delete Course
-                  </Button>
+                  <div>
+                    <Button onClick={deleteLesson} variant="danger">
+                      Delete Lesson
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
@@ -125,7 +127,7 @@ export default function Lesson({ username }: { username: string }) {
             ) : (
               <></>
             )}
-            {viewed === null ? (
+            {data.creator === username ? null : viewed === null ? (
               <div>
                 <Spinner />
               </div>
@@ -142,8 +144,18 @@ export default function Lesson({ username }: { username: string }) {
                 <h3>Lesson Quiz</h3>
                 <div>
                   <p>{data.quiz.description}</p>
-                  <Button href={`/courses/${courseId}/${lessonNum}/quiz`}>
-                    Start Quiz
+                  <Button
+                    href={`/courses/${courseId}/${lessonNum}/quiz`}
+                    disabled={data.quiz.completed.includes(username)}
+                    variant={
+                      !data.quiz.completed.includes(username)
+                        ? "primary"
+                        : "warning"
+                    }
+                  >
+                    {!data.quiz.completed.includes(username)
+                      ? "Start Quiz"
+                      : "Quiz Completed"}
                   </Button>
                 </div>
               </div>
