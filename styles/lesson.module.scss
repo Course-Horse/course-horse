@@ -13,6 +13,13 @@
   }
 }
 
+.endButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+}
+
 .videos {
   margin: 10px 0px;
   display: flex;

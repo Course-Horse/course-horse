@@ -58,20 +58,17 @@ export default function Course({ username }: { username: any }) {
         .catch((err) => {
           alert("Unable to load course.");
           window.location.href = "/courses";
-        });
-    }
-
-    if (courseId) {
-      axios
-        .get(`/api/courses/${courseId}/enroll`)
-        .then((res) => {
-          console.log(res);
-          setEnrolled(res.data.enrolled);
-          setLoading(false);
         })
-        .catch((err) => {
-          alert("Unable to load course.");
-          window.location.href = "/courses";
+        .then(() => {
+          axios
+            .get(`/api/courses/${courseId}/enroll`)
+            .then((res) => {
+              console.log(res);
+              setEnrolled(res.data.enrolled);
+            })
+            .catch((err) => {
+              alert("Unable to load course enrollment status.");
+            });
         });
     }
   }, []);
@@ -97,7 +94,7 @@ export default function Course({ username }: { username: any }) {
         setEnrolled(res.data.enrolled);
       })
       .catch((err) => {
-        alert("Unable to enroll course.");
+        alert("Unable to toggle enrollment of course.");
       });
   }
 

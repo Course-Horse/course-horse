@@ -1,0 +1,31 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background-color: var(--bs-gray-200);
+  padding: 20px;
+  border-radius: 15px;
+
+  > div {
+    border-bottom: 1px solid var(--bs-gray-300);
+
+    > :first-child {
+      font-weight: bold;
+    }
+
+    > p {
+      margin: 0px;
+    }
+  }
+
+  > p {
+    margin: 0px;
+    text-indent: 20px;
+  }
+}

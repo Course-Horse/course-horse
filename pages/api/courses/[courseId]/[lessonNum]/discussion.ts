@@ -60,7 +60,11 @@ export default async function handler(
     case "POST":
       let { message } = req.body;
       try {
-        result = await lessonData.createMessage(lesson._id, session.username, message);
+        result = await lessonData.createMessage(
+          lesson._id.toString(),
+          session.username,
+          message
+        );
       } catch (e) {
         return res.status(500).json({ error: e });
       }

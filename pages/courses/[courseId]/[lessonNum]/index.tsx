@@ -127,18 +127,27 @@ export default function Lesson({ username }: { username: string }) {
             ) : (
               <></>
             )}
-            {data.creator === username ? null : viewed === null ? (
-              <div>
-                <Spinner />
-              </div>
-            ) : (
+            <div className={styles.endButtons}>
+              {data.creator === username ? null : viewed === null ? (
+                <div>
+                  <Spinner />
+                </div>
+              ) : (
+                <Button
+                  variant={viewed ? "warning" : "primary"}
+                  onClick={toggleViewed}
+                >
+                  {viewed ? "Unmark Lesson as Viewed" : "Mark Lesson as Viewed"}
+                </Button>
+              )}
               <Button
-                variant={viewed ? "warning" : "primary"}
-                onClick={toggleViewed}
+                variant="secondary"
+                href={`/courses/${courseId}/${lessonNum}/discussion`}
               >
-                {viewed ? "Unmark Lesson as Viewed" : "Mark Lesson as Viewed"}
+                Go to Lesson Discussion
               </Button>
-            )}
+            </div>
+
             {data.quiz !== null ? (
               <div className={styles.quiz}>
                 <h3>Lesson Quiz</h3>
