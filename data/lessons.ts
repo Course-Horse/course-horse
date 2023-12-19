@@ -216,6 +216,18 @@ const methods = {
       lessonId,
       "lessonId"
     )) as Lesson;
+    
+    // retrieve course from supplied lessonId
+    let course = (await mongo.getDocById(
+      courses,
+      lesson.courseId,
+      "courseId"
+    )) as Course;
+
+    // confirm user is not the creator of the course
+    if (course.creator === username) {
+      throw "user cannot view a lesson from their own course";
+    }
 
     // confirm user is enrolled in the course
     if (!user.enrolledCourses.includes(lesson.courseId)) {
@@ -270,6 +282,18 @@ const methods = {
       lessonId,
       "lessonId"
     )) as Lesson;
+
+    // retrieve course from supplied lessonId
+    let course = (await mongo.getDocById(
+      courses,
+      lesson.courseId,
+      "courseId"
+    )) as Course;
+
+    // confirm user is not the creator of the course
+    if (course.creator === username) {
+      throw "user cannot take quiz for a lesson of their own course";
+    }
 
     // confirm user is enrolled in the course
     if (!user.enrolledCourses.includes(lesson.courseId)) {

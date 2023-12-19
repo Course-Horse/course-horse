@@ -84,3 +84,10 @@ export interface Message {
     message: string;
     created: Date;
 }
+
+export interface QueryParams{
+    usernameQuery?: string;
+    sortBy?: string;
+    sortOrder?: boolean;
+    statusFilter?: string[];
+}
