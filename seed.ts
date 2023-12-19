@@ -58,8 +58,6 @@ async function seeding(){
 
     await userData.getUser('foobar554');
 
-    await userData.getApplications();
-
     await userData.deleteUser('tylerlane603');
 
     await userData.updateUser('foobar554', {

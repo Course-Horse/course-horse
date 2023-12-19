@@ -152,20 +152,22 @@ const methods = {
 
     // validate email
     if (fields.hasOwnProperty("email")) {
-      let emailTaken = false;
-      try {
-        await mongo.getDocByParam(
-          users,
-          "email",
-          fields.email?.trim(),
-          "email"
-        );
-        emailTaken = true;
-      } catch (e) {}
-      if (emailTaken) {
-        throw "email taken";
+      if (fields.email?.trim() !== new_user.email){
+        let emailTaken = false;
+        try {
+          await mongo.getDocByParam(
+            users,
+            "email",
+            fields.email?.trim(),
+            "email"
+          );
+          emailTaken = true;
+        } catch (e) {}
+        if (emailTaken) {
+          throw "email taken";
+        }
+        new_user.email = validator.checkEmail(fields.email);
       }
-      new_user.email = validator.checkEmail(fields.email);
     }
 
     // validate first name
@@ -309,7 +311,7 @@ const methods = {
    * @param {string} sortBy [created, username]
    * @param {boolean} sortOrder [true: ascending, false: descending]
    * @param {string[]} statusFilter array of statuses to filter by [approved, declined, pending]
-   * @returns {Promise} Promise object that resolves to an array of all users with specified application
+   * @returns {Promise} Promise object that resolves to an array of all applications
    */
   async getApplications(
     usernameQuery?: string,
@@ -327,9 +329,10 @@ const methods = {
     }
 
     // validate and filter by application status if provided
-    if (!statusFilter) statusFilter = ["pending", "accepted", "rejected"];
     statusFilter = validator.checkStringArray(statusFilter, "statusFilter");
-    query["application.status"] = { $in: statusFilter };
+    if (statusFilter && statusFilter.length > 0) {
+      query["application.status"] = { $in: statusFilter };
+    }
 
     // set sortBy and sortOrder parameters if provided
     if (sortBy === "created") {
@@ -340,14 +343,15 @@ const methods = {
 
     // query and sort data from the database
     const usersCollection = await users();
-    const usersWithApplications = (await usersCollection
+    const usersWithApplications = await usersCollection
       .find(query)
       .sort(sortOptions)
-      .toArray()) as User[];
-    const usersWithoutPasswords = usersWithApplications.map(
-      ({ password, ...rest }) => rest
+      .toArray();
+    const applications = usersWithApplications.map(
+      (user: User) => user.application
     );
-    return usersWithoutPasswords;
+
+    return applications;
   },
 
   /**
