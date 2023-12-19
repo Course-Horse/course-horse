@@ -136,13 +136,14 @@ async function deleteDocById(collectionGetter, id, docType) {
   id = checkId(id, "id");
 
   let collection = await collectionGetter();
+  let docToDelete = await collection.findOne({_id: new ObjectId(id)});
   let deletionInfo = await collection.findOneAndDelete({
     _id: new ObjectId(id),
   });
-  if (deletionInfo.lastErrorObject.n === 0) {
+  if (!deletionInfo) {
     throw `could not delete ${docType} with id of ${id}`;
   }
-  return deletionInfo.value;
+  return docToDelete;
 }
 
 /**

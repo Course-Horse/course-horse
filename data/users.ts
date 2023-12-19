@@ -108,7 +108,7 @@ const methods = {
     lastName = validator.checkName(lastName, "last name");
 
     // encrypt password with specified salt rounds
-    const saltRounds = 16;
+    const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // create user object
@@ -186,7 +186,7 @@ const methods = {
     // validate password and encrypt with specified salt rounds
     if (fields.hasOwnProperty("password")) {
       let password = validator.checkPassword(fields.password, "password");
-      const saltRounds = 16;
+      const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       new_user.password = hashedPassword;
     }
@@ -299,6 +299,7 @@ const methods = {
       "user"
     )) as User;
     delete deleted_user.password;
+    console.log(deleted_user);
     return deleted_user;
   },
 
