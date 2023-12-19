@@ -15,13 +15,12 @@ export default async function handler(
       .status(401)
       .json({ error: "You must be signed in to interact with discussions." });
 
-  // api functions
   const method = req.method;
+  // GET A LIST OF APPLICATIONS
   if (method === "GET") {
+    // get and validate user inputs
     let { usernameQuery, sortBy, sortOrder, statusFilter } = req.query;
     let applicationParams: QueryParams = {};
-
-    // validate user inputs
     try {
       if (usernameQuery) {
         applicationParams.usernameQuery = validator.checkString(
@@ -52,9 +51,7 @@ export default async function handler(
       return res.status(400).json({ error: e });
     }
 
-    console.log(applicationParams);
-
-    // make call to backend
+    // attempt to get applications
     let result;
     try {
       result = await userData.getApplications(
@@ -67,26 +64,56 @@ export default async function handler(
       return res.status(500).json({ error: e });
     }
 
+    // return list of applications
     return res.status(200).json({ users: result });
   }
 
+  // CREATE A NEW APPLICATION
   if (method === "POST") {
+    // get and validate user inputs
+    let { content, documents } = req.body;
     try {
-      // retrieve and validate parameters
-      let { content, documents } = req.body;
       content = validator.checkString(content, "content");
       documents = validator.checkLinkStringArray(documents, "documents");
+    } catch (e) {
+      return res.status(400).json({ error: e });
+    }
 
-      // make call to backend
-      let result = await userData.createApplication(
+    // get user
+    let user;
+    try {
+      user = await userData.getUser(session.username);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
+
+    // check if user already has a pending or accepted application
+    if (user.application) {
+      if (user.application.status === "pending") {
+        return res.status(403).json({
+          error: "You already have a pending application.",
+        });
+      } else if (user.application.status === "accepted") {
+        return res.status(403).json({
+          error: "You already have an accepted application.",
+        });
+      }
+    }
+
+    // attempt to create application
+    let result;
+    try {
+      result = await userData.createApplication(
         session.username,
         content,
         documents
       );
-      return res.status(200).json({ user: result });
     } catch (e) {
       return res.status(500).json({ error: e });
     }
+
+    // return new user with new application
+    return res.status(200).json({ user: result });
   }
 
   return res
