@@ -8,9 +8,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  const method = req.method;
-  const session = await auth.getSession({ req });
+  // check if user is signed in
+  const session = (await auth.getSession({ req, res })) as any;
+  if (!session.username)
+    return res
+      .status(401)
+      .json({ error: "You must be signed in to interact with discussions." });
 
+  const method = req.method;
+  // gets all users with a specified application
   if (method === "GET") {
     let { usernameQuery, sortBy, sortOrder, statusFilter } = req.query;
     let applicationParams: QueryParams = {};
@@ -25,7 +31,10 @@ export default async function handler(
 
     // validate sortBy
     if (sortBy) {
-      applicationParams.sortBy = validator.checkSortByApplication(sortBy, "sortBy");
+      applicationParams.sortBy = validator.checkSortByApplication(
+        sortBy,
+        "sortBy"
+      );
     }
 
     // validate sortOrder
@@ -57,7 +66,22 @@ export default async function handler(
   }
 
   if (method === "POST") {
-    return res.status(500).json({ TODO: `IMPLEMENT ME` });
+    // retrieve and validate parameters
+    let { content, documents } = req.body;
+    content = validator.checkString(content, "content");
+    documents = validator.checkLinkStringArray(documents, "documents");
+
+    // make call to backend
+    try {
+      let result = await userData.createApplication(
+        session.username,
+        content,
+        documents
+      );
+      return res.status(200).json({ user: result });
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
   }
 
   return res
