@@ -54,25 +54,25 @@ export interface Lesson {
     content: string;
     videos: string[]; // strings begin with "https://www.youtube.com/embed/"
     created: Date;
-    viewed: string[]; // array of user ObjectIds()
+    viewed: string[]; // array of usernames
     quiz: Quiz;
-    discussion: Message[]
+    discussion: Message[];
 }
 
 export interface Quiz {
     description: string;
     questions: Question[];
-    completed: string[] 
+    completed: string[];  // array of usernames
 }
 
 export interface Question {
-    question: string
-    answers: string[],
-    correctAnswer: number,
+    question: string;
+    answers: string[];
+    correctAnswer: number;
 }
 
 export interface Message {
-    username: string,
-    message: string,
-    created: Date,
+    username: string;
+    message: string;
+    created: Date;
 }
