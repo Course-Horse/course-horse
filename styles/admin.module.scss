@@ -1,0 +1,66 @@
+.browse {
+  > form {
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    > div {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      margin: 0;
+      > div {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        align-items: center;
+      }
+    }
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.application {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .applicationDetails {
+    display: flex;
+    flex-direction: column;
+
+    img {
+      height: 150px;
+      max-width: 150px;
+      height: auto;
+      align-self: center;
+    }
+
+    * {
+      margin: 0;
+    }
+
+    > div {
+      padding: 5px;
+    }
+
+    > .applicationContent {
+      border-bottom: 1px solid #ccc;
+      border-top: 1px solid #ccc;
+    }
+  }
+
+  .applicationActions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 10px;
+  }
+}

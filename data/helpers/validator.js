@@ -1,5 +1,6 @@
 const exportedMethods = {
   TAGS: ["math", "science", "english", "history", "art", "music", "other"],
+  STATUSES: ["pending", "accepted", "declined"],
 
   checkString(strVal, varName) {
     if (!strVal) throw `You must supply a ${varName}!`;

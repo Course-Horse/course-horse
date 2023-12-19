@@ -3,12 +3,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import $ from "jquery";
 
+import validator from "@/data/helpers/validator.js";
 import auth from "@/auth/";
 import styles from "@/styles/courses.module.scss";
 import CourseList from "@/components/courseList/courselist";
 import NavBar from "@/components/navbar/navbar";
-
-const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
 
 export default function Courses({ username }: { username: any }) {
   const [loadingMyCourses, setLoadingMyCourses] = useState(true);
@@ -132,7 +131,7 @@ export default function Courses({ username }: { username: any }) {
                 </div>
               </div>
               <div id="tags">
-                {TAGS.map((tag) => {
+                {validator.TAGS.map((tag) => {
                   let lower = tag.toLocaleLowerCase();
                   return (
                     <div key={tag}>
