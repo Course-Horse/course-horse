@@ -117,7 +117,7 @@ export default function Admin({ username }: { username: any }) {
             <div className={styles.applicationList}>
               {data.map((application: any, index: number) => {
                 return (
-                  <Link href={`/admin/${application.username}`}>
+                  <Link href={`/admin/${application.username}`} key={index}>
                     <div
                       style={{
                         backgroundColor:

@@ -16,8 +16,6 @@ export default async function handler(
       .json({ error: "You must be signed in to interact with discussions." });
 
   const method = req.method;
-  const session = await auth.getSession({ req, res });
-
   if (method === "GET") {
     let { usernameQuery, sortBy, sortOrder, statusFilter } = req.query;
     let applicationParams: QueryParams = {};
