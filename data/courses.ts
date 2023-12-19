@@ -10,7 +10,7 @@ const methods = {
    * @param {string} sortBy [created, title]
    * @param {boolean} sortOrder [true: ascending, false: descending]
    * @param {string[]} tagsFilter array of tags to filter by
-   * @returns {Promise} Promise object that resolves to an array of courses
+   * @returns {Promise<Course[]>} Promise object that resolves to an array of courses
    */
   async getCourses(
     title?: string,
