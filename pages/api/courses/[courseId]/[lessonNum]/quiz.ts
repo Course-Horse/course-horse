@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await auth.getSession({ req, res });
+  const session = (await auth.getSession({ req, res })) as any;
 
   let user;
   try {
@@ -52,10 +52,6 @@ export default async function handler(
       .json({ error: "You are not enrolled in this course." });
 
   switch (method) {
-    // GETS WHETHER QUIZ IS COMPLETED
-    case "GET":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
-
     // SUBMITS QUIZ
     case "POST":
       let answers = req.body.answers;
