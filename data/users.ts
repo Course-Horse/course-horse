@@ -1,6 +1,6 @@
 import { courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-import { User, UserUpdate } from "@/types";
+import { Application, User, UserUpdate } from "@/types";
 const bcrypt = require("bcrypt");
 
 const methods = {
@@ -424,6 +424,38 @@ const methods = {
 
     // update user's application status and update the database
     user.application.status = status;
+    let result = (await mongo.replaceDocById(
+      users,
+      user._id.toString(),
+      user,
+      "user"
+    )) as User;
+    return result;
+  },
+
+  /**
+   * Deletes a user's application
+   * @param username of the user to delete the application for
+   * @returns {Promise} Promise object that resolves to a user object
+   */
+  async deleteApplication(username: string): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrieve user to delete application for
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // check if user has an application
+    if (user.application === null)
+      throw `${username} does not have an application to delete`;
+
+    // update user's application status and update the database
+    user.application = null;
     let result = (await mongo.replaceDocById(
       users,
       user._id.toString(),
