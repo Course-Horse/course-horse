@@ -156,6 +156,14 @@ const exportedMethods = {
     return sortBy;
   },
 
+  checkSortByApplication(sortBy, varName) {
+    sortBy = this.checkString(sortBy, varName);
+    sortBy = sortBy.toLowerCase();
+    if (!["created", "username"].includes(sortBy))
+      throw `${varName} must be either 'created' or 'username'`;
+    return sortBy;
+  },
+
   checkSortOrder(sortOrder, varName) {
     sortOrder = this.checkString(sortOrder, varName);
     sortOrder = sortOrder.toLowerCase();
