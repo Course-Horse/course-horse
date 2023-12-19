@@ -1,4 +1,4 @@
-import { users } from "@/config/mongoCollections.js";
+import { courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
 import { User, UserUpdate } from "@/types";
 const bcrypt = require("bcrypt");
@@ -90,8 +90,16 @@ const methods = {
     // validate password
     password = validator.checkPassword(password, "password");
 
-    // validate email
+    // validate email and make sure email hasn't already been taken
     email = validator.checkEmail(email, "email");
+    let emailTaken = false;
+    try {
+      await mongo.getDocByParam(users, "email", email, "email");
+      emailTaken = true;
+    } catch (e) {}
+    if (emailTaken) {
+      throw "email taken";
+    }
 
     // validate first name
     firstName = validator.checkName(firstName, "first name");
@@ -144,6 +152,19 @@ const methods = {
 
     // validate email
     if (fields.hasOwnProperty("email")) {
+      let emailTaken = false;
+      try {
+        await mongo.getDocByParam(
+          users,
+          "email",
+          fields.email?.trim(),
+          "email"
+        );
+        emailTaken = true;
+      } catch (e) {}
+      if (emailTaken) {
+        throw "email taken";
+      }
       new_user.email = validator.checkEmail(fields.email);
     }
 
@@ -203,6 +224,48 @@ const methods = {
 
     // update user with supplied profile picture
     user.profilePicture = picture;
+    let result = (await mongo.replaceDocById(
+      users,
+      user._id.toString(),
+      user,
+      "user"
+    )) as User;
+    return result;
+  },
+
+  /**
+   * Toggles a user's enrollment in a specific course
+   * @param {string} username of the user
+   * @param {string} courseId id of the course
+   * @returns {Promise} Promise object that resolves to a user object
+   */
+  async toggleEnrollment(username: string, courseId: string): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrive user from database
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // validate courseId
+    courseId = mongo.checkId(courseId, "courseId");
+
+    // confirm course with supplied id exists
+    await mongo.getDocById(courses, courseId, "courseId");
+
+    // toggle user's enrollment of supplied courseId
+    const courseIndex = user.enrolledCourses.indexOf(courseId);
+    if (courseIndex > -1) {
+      user.enrolledCourses.splice(courseIndex, 1);
+    } else {
+      user.enrolledCourses.push(courseId);
+    }
+
+    // update user with toggled enrolled courses in the database
     let result = (await mongo.replaceDocById(
       users,
       user._id.toString(),
