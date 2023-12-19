@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await auth.getSession({ req, res });
+  const session = (await auth.getSession({ req, res })) as any;
   console.log(session);
 
   switch (method) {

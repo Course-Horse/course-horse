@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse<any>
 ) {
   const method = req.method;
-  const session = await auth.getSession({ req, res });
+  const session = (await auth.getSession({ req, res })) as any;
 
   if (!session.username)
     return res
@@ -19,11 +19,13 @@ export default async function handler(
     // GET LIST OF COURSES
     case "GET":
       let courses;
-      let thisTitle = req.query.title;
-      let thisSortBy = req.query.sortBy;
+      let thisTitle = req.query.title as any;
+      let thisSortBy = req.query.sortBy as any;
       let thisSortOrder = req.query.sortOrder === "desc" ? false : true;
       let thisTags =
-        req.query.tags !== undefined ? JSON.parse(req.query.tags) : undefined;
+        req.query.tags !== undefined
+          ? JSON.parse(req.query.tags as any)
+          : undefined;
 
       try {
         courses = await courseData.getCourses(

@@ -14,7 +14,7 @@ const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
 
 export default function EditCourse({ username }: { username: any }) {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null) as any;
   const { courseId } = useParams();
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function EditCourse({ username }: { username: any }) {
     e.preventDefault();
     let title = $("#courseName").val();
     let description = $("#courseDescription").val();
-    let tags = $("#tags div input");
+    let tags = $("#tags div input") as any;
     let tagList = [];
     for (let tag of tags) {
       if (tag.checked) {
@@ -79,7 +79,7 @@ export default function EditCourse({ username }: { username: any }) {
 
   function submitPicture(e: any) {
     e.preventDefault();
-    let coursePicture = $("#courseImage")[0];
+    let coursePicture = $("#courseImage")[0] as any;
     if (!coursePicture.files || !coursePicture.files[0]) {
       alert("You must provide a course image!");
       return;

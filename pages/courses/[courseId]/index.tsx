@@ -13,7 +13,7 @@ function LessonPreview({
   num,
   data,
 }: {
-  courseId: string;
+  courseId: any;
   num: number;
   data: any;
 }) {
@@ -43,7 +43,8 @@ export default function Course({ username }: { username: any }) {
   const router = useRouter();
   const { courseId } = router.query;
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null) as any;
+  const [enrolled, setEnrolled] = useState(null);
 
   useEffect(() => {
     if (courseId) {
@@ -59,7 +60,46 @@ export default function Course({ username }: { username: any }) {
           window.location.href = "/courses";
         });
     }
+
+    if (courseId) {
+      axios
+        .get(`/api/courses/${courseId}/enroll`)
+        .then((res) => {
+          console.log(res);
+          setEnrolled(res.data.enrolled);
+          setLoading(false);
+        })
+        .catch((err) => {
+          alert("Unable to load course.");
+          window.location.href = "/courses";
+        });
+    }
   }, []);
+
+  function deleteCourse() {
+    axios
+      .delete(`/api/courses/${courseId}`)
+      .then((res) => {
+        alert("Course deleted.");
+        window.location.href = "/courses";
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Unable to delete course.");
+      });
+  }
+
+  function toggleEnroll() {
+    axios
+      .post(`/api/courses/${courseId}/enroll`)
+      .then((res) => {
+        console.log(res.data.enrolled);
+        setEnrolled(res.data.enrolled);
+      })
+      .catch((err) => {
+        alert("Unable to enroll course.");
+      });
+  }
 
   return (
     <>
@@ -81,9 +121,28 @@ export default function Course({ username }: { username: any }) {
                 <h1>{data.title} </h1>
                 <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
+
                 {data.creator !== username ? null : (
-                  <Button href={`/courses/${courseId}/create`} variant="danger">
-                    Delete Course
+                  <div>
+                    <Button
+                      variant="secondary"
+                      href={`/courses/${courseId}/edit`}
+                    >
+                      Edit Course
+                    </Button>
+                    <Button onClick={deleteCourse} variant="danger">
+                      Delete Course
+                    </Button>
+                  </div>
+                )}
+                {data.creator === username ? null : enrolled === null ? (
+                  <Spinner />
+                ) : (
+                  <Button
+                    onClick={toggleEnroll}
+                    variant={enrolled ? "danger" : "primary"}
+                  >
+                    {enrolled ? "Unenroll" : "Enroll"}
                   </Button>
                 )}
               </div>
@@ -102,7 +161,7 @@ export default function Course({ username }: { username: any }) {
                 {data.lessons.length === 0 ? (
                   <h3>No Lessons Available</h3>
                 ) : (
-                  data.lessons.map((lesson, index) => {
+                  data.lessons.map((lesson: any, index: number) => {
                     return (
                       <LessonPreview
                         key={index}

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import auth from "@/auth";
-import { courseData, lessonData } from "@/data";
+import { courseData, lessonData, userData } from "@/data";
 import { mongo, validator } from "@/data/helpers";
 
 export default async function handler(
@@ -12,6 +12,13 @@ export default async function handler(
     return res
       .status(401)
       .json({ error: "You must be signed in to interact with lessons." });
+
+  let user;
+  try {
+    user = await userData.getUser(session.username);
+  } catch (e) {
+    return res.status(404).json({ error: "User not found." });
+  }
 
   let courseId = req.query.courseId as string;
   try {
@@ -35,41 +42,29 @@ export default async function handler(
     return res.status(400).json({ error: e });
   }
 
-  let result = undefined as any;
+  let lesson;
+  try {
+    lesson = await lessonData.getLesson(course.lessons[lessonNum].toString());
+  } catch (e) {
+    return res.status(404).json({ error: "Lesson not found." });
+  }
+
   const method = req.method;
+  let result;
   switch (method) {
-    // GET SINGLE LESSON
+    // returns the discussion for a specified lesson
     case "GET":
-      try {
-        result = await lessonData.getLesson(
-          course.lessons[lessonNum].toString()
-        );
-      } catch (e) {
-        return res.status(404).json({ error: "Lesson not found." });
-      }
+      return res.status(200).json({ discussion: lesson.discussion });
 
-      result.courseTitle = course.title;
-      result.coursePicture = course.coursePicture;
-      result.creator = course.creator;
-      return res.status(200).json(result);
-
-    // UPDATE LESSON
+    // adds a message object to the discussion array of a specified lesson
     case "POST":
-      return res.status(500).json({ TODO: `IMPLEMENT ME` });
-
-    // DELETE LESSON
-    case "DELETE":
-      if (session.username !== course.creator)
-        return res.status(403).json({
-          error: "You must be the course creator to delete lessons.",
-        });
-
+      let { message } = req.body;
       try {
-        await lessonData.deleteLesson(course.lessons[lessonNum].toString());
+        result = await lessonData.createMessage(lesson._id, session.username, message);
       } catch (e) {
-        return res.status(500).json({ error: `Failed to delete lesson.` });
+        return res.status(500).json({ error: e });
       }
-      return res.status(200).json({ success: `Lesson deleted.` });
+      return res.status(200).json({ discussion: result });
   }
 
   return res

@@ -27,7 +27,8 @@ export default function Lesson({ username }: { username: string }) {
   const { courseId, lessonNum } = router.query;
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null) as any;
+  const [viewed, setViewed] = useState(null);
 
   useEffect(() => {
     axios
@@ -39,9 +40,43 @@ export default function Lesson({ username }: { username: string }) {
       })
       .catch((err) => {
         console.log(err);
-        // setLoading(false);
+        setLoading(false);
+      });
+
+    axios
+      .get(`/api/courses/${courseId}/${lessonNum}/view`)
+      .then((res) => {
+        console.log(res.data.viewed);
+        setViewed(res.data.viewed);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }, []);
+
+  function toggleViewed() {
+    axios
+      .post(`/api/courses/${courseId}/${lessonNum}/view`)
+      .then((res) => {
+        console.log(res.data);
+        setViewed(res.data.viewed);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function deleteLesson() {
+    axios
+      .delete(`/api/courses/${courseId}/${lessonNum}`)
+      .then((res) => {
+        console.log(res);
+        window.location.href = `/courses/${courseId}`;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   return (
     <>
@@ -65,6 +100,13 @@ export default function Lesson({ username }: { username: string }) {
                   Lesson {lessonNum}: {data.title}
                 </h2>
                 <p>{data.description}</p>
+                {data.creator !== username ? null : (
+                  <div>
+                    <Button onClick={deleteLesson} variant="danger">
+                      Delete Lesson
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
             <div className={styles.content}>
@@ -77,7 +119,7 @@ export default function Lesson({ username }: { username: string }) {
               <div className={styles.videos}>
                 <h3>Lesson Videos</h3>
                 <div>
-                  {data.videos.map((link, index) => {
+                  {data.videos.map((link: string, index: number) => {
                     return <YTEmbed key={`${index}_${link}`} link={link} />;
                   })}
                 </div>
@@ -85,13 +127,35 @@ export default function Lesson({ username }: { username: string }) {
             ) : (
               <></>
             )}
+            {data.creator === username ? null : viewed === null ? (
+              <div>
+                <Spinner />
+              </div>
+            ) : (
+              <Button
+                variant={viewed ? "warning" : "primary"}
+                onClick={toggleViewed}
+              >
+                {viewed ? "Unmark Lesson as Viewed" : "Mark Lesson as Viewed"}
+              </Button>
+            )}
             {data.quiz !== null ? (
               <div className={styles.quiz}>
                 <h3>Lesson Quiz</h3>
                 <div>
                   <p>{data.quiz.description}</p>
-                  <Button href={`/courses/${courseId}/${lessonNum}/quiz`}>
-                    Start Quiz
+                  <Button
+                    href={`/courses/${courseId}/${lessonNum}/quiz`}
+                    disabled={data.quiz.completed.includes(username)}
+                    variant={
+                      !data.quiz.completed.includes(username)
+                        ? "primary"
+                        : "warning"
+                    }
+                  >
+                    {!data.quiz.completed.includes(username)
+                      ? "Start Quiz"
+                      : "Quiz Completed"}
                   </Button>
                 </div>
               </div>

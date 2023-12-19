@@ -1,6 +1,6 @@
 import { lessons, courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-import { Quiz, Lesson, Course, User, LessonUpdate } from "@/types";
+import { Quiz, Lesson, Course, User, LessonUpdate, Message } from "@/types";
 
 const methods = {
   /**
@@ -19,6 +19,50 @@ const methods = {
 
     // return lessons
     return parent_course.lessons;
+  },
+
+  /**
+   * Grade a specific quiz against a set of submitted answers
+   * @param {string} lessonId of the lesson that contains quiz to be graded
+   * @param {string} answers the submitted array of answer indices
+   * @returns {Promise<string[]>} Promise object that resolves to a boolean
+   */
+  async gradeQuiz(lessonId: string, answers: number[]): Promise<boolean> {
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve specified lesson from the database
+    let lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lesson"
+    )) as Lesson;
+
+    // check if a quiz exists for the specified lesson
+    if (!lesson.quiz || !lesson.quiz.questions) {
+      throw "Quiz not found in lesson";
+    }
+
+    // create correct answers array
+    const correctAnswers = lesson.quiz.questions.map(
+      (question) => question.correctAnswer
+    );
+
+    // make sure number of submitted answers matches number of questions
+    if (correctAnswers.length !== answers.length) {
+      throw "incorrect number of answers submitted";
+    }
+
+    // calculate score
+    let score = 0;
+    for (let i = 0; i < correctAnswers.length; i++) {
+      if (answers[i] === correctAnswers[i]) {
+        score++;
+      }
+    }
+    score /= correctAnswers.length;
+
+    return score > 0.6;
   },
 
   /**
@@ -120,14 +164,15 @@ const methods = {
     // retrieve parent course
     let parent_course = (await mongo.getDocById(
       courses,
-      lesson.courseId,
+      lesson.courseId.toString(),
       "course"
     )) as Course;
 
     // remove lessonId from course's lessons array and update in the database
     parent_course.lessons = parent_course.lessons.filter(
-      (id) => id !== lessonId
+      (id) => id.toString() !== lessonId
     );
+
     await mongo.replaceDocById(
       courses,
       parent_course._id.toString(),
@@ -286,7 +331,10 @@ const methods = {
 
     // validate videos
     if (fields.hasOwnProperty("videos")) {
-      new_lesson.videos = validator.checkVideoStringArray(fields.videos, "videos");
+      new_lesson.videos = validator.checkVideoStringArray(
+        fields.videos,
+        "videos"
+      );
     }
 
     // validate quiz
@@ -302,6 +350,65 @@ const methods = {
       "lesson"
     )) as Lesson;
     return result;
+  },
+
+  /**
+   * Creates a message in a specified lesson's discussion
+   * @param {string} lessonId of the lesson with discussion to add to
+   * @param {string} username of the user creating the message
+   * @param {string} message of the message
+   * @returns {Promise} Promise object that resolves to an array of message objects
+   */
+  async createMessage(
+    lessonId: string,
+    username: string,
+    message: string
+  ): Promise<Message[]> {
+    // validate lessonId
+    lessonId = mongo.checkId(lessonId, "lessonId");
+
+    // retrieve lesson from the database
+    let new_lesson = (await mongo.getDocById(
+      lessons,
+      lessonId,
+      "lessonId"
+    )) as Lesson;
+
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // confirm user exists in the database
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // confirm user is enrolled in the course
+    if (!user.enrolledCourses.includes(new_lesson.courseId)) {
+      throw "user not enrolled in course";
+    }
+
+    // validate message
+    message = validator.checkString(message, "message");
+
+    // create message object to be added
+    let message_obj: Message = {
+      username: username,
+      message: message,
+      created: new Date()
+    };
+
+    // update lesson with new discussion
+    new_lesson.discussion.push(message_obj);
+    let updated_lesson = (await mongo.replaceDocById(
+      lessons,
+      new_lesson._id.toString(),
+      new_lesson,
+      "lesson"
+    )) as Lesson;
+    return updated_lesson.discussion;
   },
 };
 

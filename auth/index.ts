@@ -23,7 +23,7 @@ const exportedMethods = {
     isAuth: boolean = false,
     redirect: string = "/signin"
   ) {
-    const session = await this.getSession(context);
+    const session = (await this.getSession(context)) as any;
     let username = session.username;
 
     if ((!username && !isAuth) || (username && isAuth)) {
@@ -35,7 +35,7 @@ const exportedMethods = {
       };
     }
 
-    let result = {};
+    let result = {} as any;
     if (username) result.username = username;
 
     return {
@@ -50,9 +50,9 @@ const exportedMethods = {
    * @returns redirect object if user is not an admin
    */
   async checkAdmin(context: any, redirect: string = "/profile") {
-    const session = await this.getSession(context);
+    const session = (await this.getSession(context)) as any;
     let username = session.username;
-    let result = {};
+    let result = {} as any;
     if (username) result.username = username;
 
     if (!username)
@@ -89,9 +89,9 @@ const exportedMethods = {
     has: boolean = true,
     redirect: string = "/profile"
   ) {
-    const session = await this.getSession(context);
+    const session = (await this.getSession(context)) as any;
     let username = session.username;
-    let result = {};
+    let result = {} as any;
     if (username) result.username = username;
 
     if (!username)

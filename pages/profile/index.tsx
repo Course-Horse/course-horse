@@ -14,7 +14,7 @@ export default function MyProfile({ username }: { username: any }) {
   const [loadingPic, setLoadingPic] = useState(false);
   const [loadingPersonal, setLoadingPersonal] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null) as any;
 
   useEffect(() => {
     axios
@@ -35,7 +35,7 @@ export default function MyProfile({ username }: { username: any }) {
 
   async function submitProfilePicture(e: any) {
     e.preventDefault();
-    let profilePicture = $("#profilePicture")[0];
+    let profilePicture = $("#profilePicture")[0] as any;
     if (!profilePicture.files || !profilePicture.files[0]) {
       alert("You must provide a course image!");
       return;

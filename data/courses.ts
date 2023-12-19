@@ -197,7 +197,7 @@ const methods = {
     // delete all lessons within course
     let lessonIdsToDelete = course.lessons;
     for (const lessonId of lessonIdsToDelete) {
-      lessonData.deleteLesson(lessonId);
+      await lessonData.deleteLesson(lessonId.toString());
     }
 
     // remove courseId from all user's enrolledCourses

@@ -9,7 +9,7 @@ export default async function handler(
   const method = req.method;
   switch (method) {
     case "GET":
-      const session = await auth.getSession({ req, res });
+      const session = (await auth.getSession({ req, res })) as any;
       let username = session.username;
       if (!username)
         return res
