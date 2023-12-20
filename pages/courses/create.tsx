@@ -88,6 +88,7 @@ export default function CreateCourse({ username }: { username: any }) {
           <div>
             <label htmlFor="courseImage">Course Image</label>
             <input id="courseImage" type="file" />
+            <p>1MB Limit</p>
           </div>
           <div>
             <label htmlFor="courseDescription">Course Description</label>

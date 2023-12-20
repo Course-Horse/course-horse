@@ -6,6 +6,7 @@ import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import NavBar from "@/components/navbar/navbar";
 import $ from "jquery";
 import axios from "axios";
+import { useEffect } from "react";
 
 export default function Apply({ username }: { username: any }) {
   function submitApplication(e: any) {
@@ -33,6 +34,23 @@ export default function Apply({ username }: { username: any }) {
         alert("Unable to submit application.");
       });
   }
+
+  useEffect(() => {
+    axios
+      .get("/api/users/")
+      .then((res) => {
+        if (res.data.application) {
+          if (res.data.application.status == "pending")
+            alert("You already have a pending application.");
+          if (res.data.application.status == "accepted")
+            alert("You are already an educator.");
+          window.location.href = "/profile";
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <>

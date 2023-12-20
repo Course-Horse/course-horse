@@ -183,9 +183,8 @@ const exportedMethods = {
   },
 
   checkTagList(tags, varName) {
-    tags = this.checkStringArray(tags, varName);
     for (let i in tags) {
-      tags[i] = this.checkTag(tags[i], "tag");
+      tags[i] = this.checkTag(tags[i], varName);
     }
     return tags;
   },

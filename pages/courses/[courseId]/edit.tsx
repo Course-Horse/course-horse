@@ -146,6 +146,7 @@ export default function EditCourse({ username }: { username: any }) {
                   type="file"
                   accept="image/jpeg, image/png, image/jpg"
                 />
+                <p>1MB Limit</p>
               </div>
               <div>
                 <label htmlFor="submitPicture">Submit New Picture</label>
