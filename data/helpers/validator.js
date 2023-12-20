@@ -1,5 +1,5 @@
 const exportedMethods = {
-  TAGS: ["math", "science", "english", "history", "art", "music", "other"],
+  TAGS: ["math", "science", "english", "history", "art", "music", "technology", "engineering", "other"],
   STATUSES: ["pending", "accepted", "declined"],
 
   checkString(strVal, varName) {
