@@ -1,6 +1,6 @@
-import { courses, users } from "@/config/mongoCollections.js";
+import { courses, users, lessons } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
-import { Application, User, UserUpdate } from "@/types";
+import { Lesson, Course, User, UserUpdate } from "@/types";
 const bcrypt = require("bcrypt");
 
 const methods = {
@@ -255,12 +255,46 @@ const methods = {
     courseId = mongo.checkId(courseId, "courseId");
 
     // confirm course with supplied id exists
-    await mongo.getDocById(courses, courseId, "courseId");
+    let course = (await mongo.getDocById(
+      courses,
+      courseId,
+      "courseId"
+    )) as Course;
 
     // toggle user's enrollment of supplied courseId
     const courseIndex = user.enrolledCourses.indexOf(courseId);
     if (courseIndex > -1) {
+      // unenroll user from course
       user.enrolledCourses.splice(courseIndex, 1);
+
+      // iterate over lessons of the course to update user's progress
+      for (let lessonId of course.lessons) {
+        let lesson = (await mongo.getDocById(
+          lessons,
+          lessonId,
+          "lessonId"
+        )) as Lesson;
+
+        // remove user from viewed array
+        lesson.viewed = lesson.viewed.filter(
+          (userId) => userId !== user._id.toString()
+        );
+
+        // if lesson has a quiz, remove user from completed array
+        if (lesson.quiz) {
+          lesson.quiz.completed = lesson.quiz.completed.filter(
+            (userId) => userId !== user._id.toString()
+          );
+        }
+
+        // update the lesson in the database
+        await mongo.replaceDocById(
+          lessons,
+          lesson._id.toString(),
+          lesson,
+          "lesson"
+        );
+      }
     } else {
       user.enrolledCourses.push(courseId);
     }
@@ -272,6 +306,7 @@ const methods = {
       user,
       "user"
     )) as User;
+    delete result.password;
     return result;
   },
 
@@ -394,6 +429,7 @@ const methods = {
       user,
       "user"
     )) as User;
+    delete result.password;
     return result;
   },
 
@@ -430,6 +466,7 @@ const methods = {
       user,
       "user"
     )) as User;
+    delete result.password;
     return result;
   },
 
@@ -462,7 +499,122 @@ const methods = {
       user,
       "user"
     )) as User;
+    delete result.password;
     return result;
+  },
+
+  /**
+   * Returns if a user has completed a specific course
+   * @param {string} username of the user
+   * @param {string} courseId id of the course
+   * @returns {Promise} Promise object that resolves to a boolean
+   */
+  async hasCompletedCourse(
+    username: string,
+    courseId: string
+  ): Promise<boolean> {
+    // validate username and retrieve user from database
+    username = validator.checkUsername(username, "username");
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // validate courseId and retrieve from database
+    courseId = mongo.checkId(courseId, "courseId");
+    let course = (await mongo.getDocById(
+      courses,
+      courseId,
+      "courseId"
+    )) as Course;
+
+    // check if user completed course
+    for (let lessonId of course.lessons) {
+      let lesson = (await mongo.getDocById(
+        lessons,
+        lessonId,
+        "lessonId"
+      )) as Lesson;
+
+      // check if user viewed the lesson
+      if (!lesson.viewed.includes(user._id.toString())) {
+        return false;
+      }
+
+      // if lesson has a quiz, check if user completed it
+      if (lesson.quiz && !lesson.quiz.completed.includes(user._id.toString())) {
+        return false;
+      }
+    }
+
+    return true;
+  },
+
+  /**
+   * gets all courses completed by a specific user
+   * @param {string} username of the user
+   * @returns {Promise} Promise object that resolves to an array of course objects
+   */
+  async getCompletedCourses(username: string): Promise<Course[]> {
+    // validate username and retrieve user from database
+    username = validator.checkUsername(username, "username");
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    let completedCourses: Course[] = [];
+
+    // add completed enrolled courses to completed courses array
+    for (let courseId of user.enrolledCourses) {
+      const isCompleted = await this.hasCompletedCourse(username, courseId);
+      if (isCompleted) {
+        let course = (await mongo.getDocById(
+          courses,
+          courseId,
+          "courseId"
+        )) as Course;
+        completedCourses.push(course);
+      }
+    }
+
+    return completedCourses;
+  },
+
+  /**
+   * gets a sorted array of the most popular completed course tags for a specific user
+   * @param {string} username of the user
+   * @returns {Promise} Promise object that resolves to an array of strings
+   */
+  async topCompletedTags(username: string): Promise<string[]> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // get all completed courses for a specific user
+    const completedCourses = await this.getCompletedCourses(username);
+
+    // aggregate and count the occurrences of each tag
+    const tagCounts: { [tag: string]: number } = {};
+    for (const course of completedCourses) {
+      for (const tag of course.tags) {
+        if (tagCounts[tag]) {
+          tagCounts[tag] += 1;
+        } else {
+          tagCounts[tag] = 1;
+        }
+      }
+    }
+
+    // sort tags based on frequency
+    const sortedTags = Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map((entry) => entry[0]);
+
+    return sortedTags;
   },
 };
 
