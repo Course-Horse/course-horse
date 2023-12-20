@@ -66,6 +66,42 @@ const methods = {
   },
 
   /**
+   * Validates a quiz object
+   * @param {Quiz} quiz object to be validated
+   * @returns {Promise<string[]>} Promise object that resolves to a quiz object
+   */
+  async validateQuiz(quiz: Quiz): Promise<Quiz> {
+    // validate description
+    quiz.description = validator.checkString(quiz.description, "quiz.description");
+
+    // validate questions
+    for (let question of quiz.questions) {
+      question.question = validator.checkString(
+        question.question,
+        "question.question"
+      );
+      question.answers = validator.checkStringArray(
+        question.answers,
+        "question.answers"
+      );
+      question.correctAnswer = validator.checkNum(
+        question.correctAnswer,
+        "question.correctAnswer"
+      );
+
+      // validate correctAnswer
+      if (
+        question.correctAnswer < 0 ||
+        question.correctAnswer >= question.answers.length
+      ) {
+        throw "correct answer index is out of bounds";
+      }
+    }
+
+    return quiz;
+  },
+
+  /**
    * Gets a lesson with a specific id
    * @param {string} lessonId of the lesson to retrieve
    * @returns {Promise<Lesson>} Promise object that resolves to a lesson object
@@ -216,7 +252,7 @@ const methods = {
       lessonId,
       "lessonId"
     )) as Lesson;
-    
+
     // retrieve course from supplied lessonId
     let course = (await mongo.getDocById(
       courses,
@@ -421,7 +457,7 @@ const methods = {
     let message_obj: Message = {
       username: username,
       message: message,
-      created: new Date()
+      created: new Date(),
     };
 
     // update lesson with new discussion
