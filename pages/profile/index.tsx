@@ -183,6 +183,7 @@ export default function MyProfile({ username }: { username: any }) {
                     type="file"
                     accept="image/jpeg, image/png, image/jpg"
                   />
+                  <p>1MB Limit</p>
                   <label htmlFor="submitPicture">Change Profile Picture</label>
                   <input id="submitPicture" type="submit" value="Upload" />
                   {loadingPic ? (
