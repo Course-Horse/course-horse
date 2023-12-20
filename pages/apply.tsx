@@ -4,8 +4,36 @@ import auth from "@/auth/";
 import TextInputList from "@/components/textInputList/textInputList";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import NavBar from "@/components/navbar/navbar";
+import $ from "jquery";
+import axios from "axios";
 
 export default function Apply({ username }: { username: any }) {
+  function submitApplication(e: any) {
+    e.preventDefault();
+    let applicationContent = $("#applicationContent").val();
+    let documents = $("#documents input") as any;
+    let documentsArr = [];
+    for (let i = 0; i < documents.length; i++) {
+      documentsArr.push(documents[i].value);
+    }
+
+    console.log(applicationContent, documentsArr);
+    axios
+      .post(`/api/applications/`, {
+        content: applicationContent,
+        documents: documentsArr,
+      })
+      .then((res) => {
+        console.log(res);
+        alert("Application submitted.");
+        window.location.href = "/profile";
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Unable to submit application.");
+      });
+  }
+
   return (
     <>
       <Head>
@@ -18,7 +46,11 @@ export default function Apply({ username }: { username: any }) {
       <NavBar username={username} />
       <main className="pageContainer">
         <h1>Apply</h1>
-        <form method="POST" className={verticalFormStyles.form}>
+        <form
+          method="POST"
+          className={verticalFormStyles.form}
+          onSubmit={submitApplication}
+        >
           <div>
             <label htmlFor="applicationContent">Application Content</label>
             <textarea

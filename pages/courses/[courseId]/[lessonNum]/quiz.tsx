@@ -53,11 +53,12 @@ export default function Quiz({ username }: { username: any }) {
       .post(`/api/courses/${courseId}/${lessonNum}/quiz`, { answers })
       .then((res) => {
         console.log(res.data);
+        alert(res.data.result ? "HAY, you passed!" : "NAY, you failed.");
         window.location.href = `/courses/${courseId}/${lessonNum}`;
       })
       .catch((err) => {
         console.log(err);
-        alert(err.response.data.error);
+        alert("Failed to submit quiz.");
       });
   }
 

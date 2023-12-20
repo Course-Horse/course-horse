@@ -380,7 +380,7 @@ const methods = {
     documents = validator.checkLinkStringArray(documents, "documents");
 
     let application = {
-      status: "Pending",
+      status: "pending",
       created: new Date(),
       content: content,
       documents: documents,
