@@ -14,6 +14,7 @@ export default function Courses({ username }: { username: any }) {
   const [myCourses, setMyCourses] = useState([]) as any;
   const [loadingBrowse, setLoadingBrowse] = useState(true);
   const [Browse, setBrowse] = useState([]);
+  const [completed, setCompleted] = useState(null) as any;
 
   useEffect(() => {
     axios
@@ -33,6 +34,16 @@ export default function Courses({ username }: { username: any }) {
         console.log(res.data);
         setBrowse(res.data);
         setLoadingBrowse(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .get("/api/courses/completed")
+      .then((res) => {
+        console.log(res.data);
+        setCompleted(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -86,17 +97,32 @@ export default function Courses({ username }: { username: any }) {
             {loadingMyCourses ? (
               <p>Loading...</p>
             ) : myCourses.creator.length > 0 ? (
-              <CourseList courses={myCourses.creator} />
+              <CourseList
+                courses={myCourses.creator}
+                completed={completed ? completed.completed : null}
+              />
             ) : (
               <p>You&apos;ve made no courses.</p>
             )}
           </div>
           <div>
             <h2>Enrolled Courses</h2>
+            <div>
+              {completed && completed.tags.length > 0
+                ? completed.tags.length <= 3
+                  ? `Top ${completed.tags.length} tags: ${completed.tags.join(
+                      ", "
+                    )}`
+                  : `Top 3 tags: ${completed.tags.slice(0, 3).join(", ")}`
+                : null}
+            </div>
             {loadingMyCourses ? (
               <p>Loading...</p>
             ) : myCourses.enrolled.length > 0 ? (
-              <CourseList courses={myCourses.enrolled} />
+              <CourseList
+                courses={myCourses.enrolled}
+                completed={completed ? completed.completed : null}
+              />
             ) : (
               <p>No enrolled courses.</p>
             )}
@@ -151,7 +177,10 @@ export default function Courses({ username }: { username: any }) {
               {loadingBrowse ? (
                 <p>Loading...</p>
               ) : Browse.length > 0 ? (
-                <CourseList courses={Browse} />
+                <CourseList
+                  courses={Browse}
+                  completed={completed ? completed.completed : null}
+                />
               ) : (
                 <p>No courses found.</p>
               )}

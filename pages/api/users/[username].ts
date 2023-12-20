@@ -40,6 +40,7 @@ export default async function handler(
       lastName: user.lastName,
       email: user.email,
       profilePicture: user.profilePicture,
+      application: user.application,
     });
   }
 

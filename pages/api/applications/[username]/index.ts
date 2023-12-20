@@ -23,6 +23,7 @@ export default async function handler(
     return res.status(500).json({ error: "Unable to get session user data." });
   }
 
+  // get and validate username to change
   let usernameToChange = req.query.username;
   try {
     usernameToChange = validator.checkUsername(

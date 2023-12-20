@@ -1,9 +1,10 @@
 .header {
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 20px;
 
-  > img {
+  img {
     width: 100px;
     height: 100px;
     align-self: center;

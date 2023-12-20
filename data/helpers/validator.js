@@ -75,7 +75,8 @@ const exportedMethods = {
       if (
         typeof arr[i] !== "string" ||
         arr[i].trim().length === 0 ||
-        !arr[i].trim().startsWith("https://")
+        (!arr[i].trim().startsWith("https://") &&
+          !arr[i].trim().startsWith("http://"))
       ) {
         throw `One or more elements in ${varName} array is not a string or is an empty string or does not start with "https://"`;
       }
@@ -182,9 +183,8 @@ const exportedMethods = {
   },
 
   checkTagList(tags, varName) {
-    tags = this.checkStringArray(tags, varName);
     for (let i in tags) {
-      tags[i] = this.checkTag(tags[i], "tag");
+      tags[i] = this.checkTag(tags[i], varName);
     }
     return tags;
   },

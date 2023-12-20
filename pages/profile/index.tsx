@@ -8,6 +8,7 @@ import auth from "@/auth/";
 import styles from "@/styles/profile.module.scss";
 import { Spinner } from "react-bootstrap";
 import NavBar from "@/components/navbar/navbar";
+import Link from "next/link";
 
 export default function MyProfile({ username }: { username: any }) {
   const [loading, setLoading] = useState(true);
@@ -172,66 +173,76 @@ export default function MyProfile({ username }: { username: any }) {
         <h1>My Profile {loading ? <Spinner /> : null}</h1>
 
         {loading ? null : (
-          <div className={styles.profile}>
-            <div>
-              <img src={data.profilePicture} />
-              <form onSubmit={submitProfilePicture}>
-                <input
-                  id="profilePicture"
-                  type="file"
-                  accept="image/jpeg, image/png, image/jpg"
-                />
-                <label htmlFor="submitPicture">Change Profile Picture</label>
-                <input id="submitPicture" type="submit" value="Upload" />
-                {loadingPic ? (
-                  <Spinner style={{ alignSelf: "center" }} />
-                ) : null}
-              </form>
+          <>
+            <div className={styles.profile}>
+              <div>
+                <img src={data.profilePicture} />
+                <form onSubmit={submitProfilePicture}>
+                  <input
+                    id="profilePicture"
+                    type="file"
+                    accept="image/jpeg, image/png, image/jpg"
+                  />
+                  <p>1MB Limit</p>
+                  <label htmlFor="submitPicture">Change Profile Picture</label>
+                  <input id="submitPicture" type="submit" value="Upload" />
+                  {loadingPic ? (
+                    <Spinner style={{ alignSelf: "center" }} />
+                  ) : null}
+                </form>
+              </div>
+              <div>
+                <h2>{data.username}</h2>
+                <form onSubmit={submitPersonal}>
+                  <h3>Personal Information</h3>
+                  <label htmlFor="firstName">First Name</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    defaultValue={data.firstName}
+                  />
+                  <label htmlFor="lastName">Last Name</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    defaultValue={data.lastName}
+                  />
+                  <label htmlFor="email">Email</label>
+                  <input type="email" id="email" defaultValue={data.email} />
+                  <label htmlFor="submitInfo">Save Personal Information</label>
+                  <input
+                    id="submitInfo"
+                    type="submit"
+                    value="Save"
+                    disabled={loadingPersonal}
+                  />
+                  {loadingPersonal ? (
+                    <Spinner style={{ alignSelf: "center" }} />
+                  ) : null}
+                </form>
+                <form onSubmit={submitPassword}>
+                  <h3>Change Password</h3>
+                  <label htmlFor="password">New Password</label>
+                  <input type="password" id="password" />
+                  <label htmlFor="confirmPassword">Confirm Password</label>
+                  <input type="password" id="confirmPassword" />
+                  <label htmlFor="submitInfo">Submit New Password</label>
+                  <input
+                    id="submitInfo"
+                    type="submit"
+                    value="Submit"
+                    disabled={loadingPassword}
+                  />
+                  {loadingPassword ? (
+                    <Spinner style={{ alignSelf: "center" }} />
+                  ) : null}
+                </form>
+              </div>
             </div>
-            <div>
-              <h2>{data.username}</h2>
-              <form onSubmit={submitPersonal}>
-                <h3>Personal Information</h3>
-                <label htmlFor="firstName">First Name</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  defaultValue={data.firstName}
-                />
-                <label htmlFor="lastName">Last Name</label>
-                <input type="text" id="lastName" defaultValue={data.lastName} />
-                <label htmlFor="email">Email</label>
-                <input type="email" id="email" defaultValue={data.email} />
-                <label htmlFor="submitInfo">Save Personal Information</label>
-                <input
-                  id="submitInfo"
-                  type="submit"
-                  value="Save"
-                  disabled={loadingPersonal}
-                />
-                {loadingPersonal ? (
-                  <Spinner style={{ alignSelf: "center" }} />
-                ) : null}
-              </form>
-              <form onSubmit={submitPassword}>
-                <h3>Change Password</h3>
-                <label htmlFor="password">New Password</label>
-                <input type="password" id="password" />
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" />
-                <label htmlFor="submitInfo">Submit New Password</label>
-                <input
-                  id="submitInfo"
-                  type="submit"
-                  value="Submit"
-                  disabled={loadingPassword}
-                />
-                {loadingPassword ? (
-                  <Spinner style={{ alignSelf: "center" }} />
-                ) : null}
-              </form>
-            </div>
-          </div>
+            {data.admin && (
+              <Link href={`/admin`}>Go to Application Portal</Link>
+            )}
+          </>
         )}
 
         <button onClick={signoutHandler}>Sign Out</button>

@@ -96,11 +96,15 @@ export default function Lesson({ username }: { username: string }) {
         ) : (
           <>
             <div className={headerStyles.header}>
-              <img src={data.coursePicture} />
+              <div>
+                <img src={data.coursePicture} />
+                <Link href={`/courses/${courseId}`}>Back to Course</Link>
+              </div>
+
               <div>
                 <h1>{data.courseTitle}</h1>
                 <h2>
-                  Lesson {lessonNum}: {data.title}
+                  Lesson {Number(lessonNum) + 1}: {data.title}
                 </h2>
                 <p>{data.description}</p>
                 {data.creator !== username ? null : (
@@ -184,6 +188,7 @@ export default function Lesson({ username }: { username: string }) {
 }
 
 import auth from "@/auth";
+import Link from "next/link";
 
 export const getServerSideProps = async (context: any) => {
   return auth.checkAuthenticated(context, false, "/signin");

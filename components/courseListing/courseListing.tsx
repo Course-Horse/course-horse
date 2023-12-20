@@ -4,6 +4,7 @@ export default function CourseListing({
   description,
   coursePicture,
   tags,
+  completed,
 }: any) {
   return (
     <a href={`/courses/${_id}`}>
@@ -13,6 +14,22 @@ export default function CourseListing({
         <p>Tags: {tags.join(", ")}</p>
         <p>{description}</p>
       </div>
+      {(() => {
+        if (!completed) {
+          return null;
+        }
+        let c = false;
+        for (let course of completed) {
+          if (course._id === _id) {
+            c = true;
+            break;
+          }
+        }
+        if (c) {
+          return <p>✅ Completed!</p>;
+        }
+        return null;
+      })()}
     </a>
   );
 }

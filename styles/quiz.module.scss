@@ -1,0 +1,38 @@
+.quiz {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+
+    > h3 {
+      margin: 0px;
+    }
+
+    > div {
+      padding: 20px;
+      border-radius: 15px;
+      background-color: var(--bs-gray-200);
+
+      > p {
+        text-indent: 20px;
+        border-bottom: 1px solid var(--bs-gray-300);
+        margin-bottom: 0px;
+        padding-bottom: 10px;
+        font-style: italic;
+      }
+
+      > div {
+        padding-top: 10px;
+        margin-left: 10px;
+
+        > p {
+          margin: 0px;
+        }
+      }
+    }
+  }
+}
