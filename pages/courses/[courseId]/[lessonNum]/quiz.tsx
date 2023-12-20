@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import auth from "@/auth/";
 import { Button, Spinner } from "react-bootstrap";
 import axios from "axios";
+import styles from "@/styles/quiz.module.scss";
 
 export default function Quiz({ username }: { username: any }) {
   const router = useRouter();
@@ -72,31 +73,37 @@ export default function Quiz({ username }: { username: any }) {
           </div>
         ) : (
           <>
-            <h1>Quiz</h1>
-            <form>
+            <form className={styles.quiz}>
+              <h1>Quiz</h1>
               {data.quiz.questions.map(
                 (question: any, questionNumber: number) => {
                   return (
                     <div key={questionNumber}>
                       <h3>Question {questionNumber + 1}</h3>
-                      <p>{question.question}</p>
-
                       <div>
-                        {question.answers.map((answer: any, index: number) => {
-                          return (
-                            <div key={`${questionNumber}_${index}`}>
-                              <input
-                                id={`Q${questionNumber}_${index}`}
-                                name={`Q${questionNumber}`}
-                                type="radio"
-                                value={index}
-                              />
-                              <label htmlFor={`Q${questionNumber}_${index}`}>
-                                {answer}
-                              </label>
-                            </div>
-                          );
-                        })}
+                        <p>{question.question}</p>
+                        <div>
+                          <p>Select an option below...</p>
+                          {question.answers.map(
+                            (answer: any, index: number) => {
+                              return (
+                                <div key={`${questionNumber}_${index}`}>
+                                  <input
+                                    id={`Q${questionNumber}_${index}`}
+                                    name={`Q${questionNumber}`}
+                                    type="radio"
+                                    value={index}
+                                  />
+                                  <label
+                                    htmlFor={`Q${questionNumber}_${index}`}
+                                  >
+                                    {answer}
+                                  </label>
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
