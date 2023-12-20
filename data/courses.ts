@@ -215,6 +215,46 @@ const methods = {
     )) as Course;
     return deleted_course;
   },
+
+  /**
+   * Updates a course with a rearranged array of lessons
+   * @param {string} courseId of the course to update
+   * @param {string[]} lessons array of lessonIds with new rearrangement
+   * @returns {Promise} Promise object that resolves to a course object
+   */
+  async rearrangeLessons(courseId: string, lessons: string[]): Promise<Course> {
+    // validate courseId and retrieve course from the database
+    courseId = mongo.checkId(courseId, "courseId");
+    let new_course = (await mongo.getDocById(
+      courses,
+      courseId,
+      "courseId"
+    )) as Course;
+
+    // validate that lessons array contains the same elements as new_course.lessons
+    if (new_course.lessons.length !== lessons.length) {
+      throw "lessons must contain the same lesson IDs as the provided course";
+    }
+    for (const lessonId of new_course.lessons) {
+      if (!lessons.includes(lessonId)) {
+        throw new Error(
+          "lessons must contain the same lesson IDs as the provided course"
+        );
+      }
+    }
+
+    // update course's lessons
+    new_course.lessons = lessons;
+
+    // update course in database using mongo helper functions
+    let result = (await mongo.replaceDocById(
+      courses,
+      new_course._id.toString(),
+      new_course,
+      "course"
+    )) as Course;
+    return result;
+  },
 };
 
 export default methods;
