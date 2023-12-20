@@ -3,6 +3,7 @@ import Head from "next/head";
 import { Button, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 
 import headerStyle from "@/styles/header.module.scss";
 import styles from "@/styles/course.module.scss";
@@ -94,6 +95,7 @@ export default function Course({ username }: { username: any }) {
         setEnrolled(res.data.enrolled);
       })
       .catch((err) => {
+        console.log(err);
         alert("Unable to toggle enrollment of course.");
       });
   }
@@ -113,7 +115,11 @@ export default function Course({ username }: { username: any }) {
         ) : (
           <>
             <div className={headerStyle.header}>
-              <img src={data.coursePicture} />
+              <div>
+                <img src={data.coursePicture} />
+                <Link href={`/courses/`}>Back to Courses</Link>
+              </div>
+
               <div>
                 <h1>{data.title} </h1>
                 <p>Tags: {data.tags.join(", ")}</p>
@@ -143,6 +149,7 @@ export default function Course({ username }: { username: any }) {
                   </Button>
                 )}
               </div>
+              {data.completed ? <p>✅ Completed!</p> : null}
             </div>
             <div className={styles.lessonList}>
               <h2>

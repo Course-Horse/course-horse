@@ -59,8 +59,24 @@ export default async function handler(
       }
     }
 
+    // get whether current user has completed course
+    let completed;
+    try {
+      let completedCourses = (await userData.getCompletedCourses(
+        session.username
+      )) as any;
+      for (let i = 0; i < completedCourses.length; i++) {
+        if (completedCourses[i]._id.toString() === courseId) {
+          completed = true;
+          break;
+        }
+      }
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
+
     // return course data
-    return res.status(200).json(course);
+    return res.status(200).json({ ...course, completed });
   }
 
   // UPDATE COURSE

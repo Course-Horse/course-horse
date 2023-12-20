@@ -271,19 +271,19 @@ const methods = {
       for (let lessonId of course.lessons) {
         let lesson = (await mongo.getDocById(
           lessons,
-          lessonId,
+          lessonId.toString(),
           "lessonId"
         )) as Lesson;
 
         // remove user from viewed array
         lesson.viewed = lesson.viewed.filter(
-          (userId) => userId !== user._id.toString()
+          (tUsername) => tUsername !== username
         );
 
         // if lesson has a quiz, remove user from completed array
         if (lesson.quiz) {
           lesson.quiz.completed = lesson.quiz.completed.filter(
-            (userId) => userId !== user._id.toString()
+            (tUsername) => tUsername !== username
           );
         }
 
@@ -523,10 +523,10 @@ const methods = {
     )) as User;
 
     // validate courseId and retrieve from database
-    courseId = mongo.checkId(courseId, "courseId");
+    courseId = mongo.checkId(courseId.toString(), "courseId");
     let course = (await mongo.getDocById(
       courses,
-      courseId,
+      courseId.toString(),
       "courseId"
     )) as Course;
 
@@ -534,17 +534,17 @@ const methods = {
     for (let lessonId of course.lessons) {
       let lesson = (await mongo.getDocById(
         lessons,
-        lessonId,
+        lessonId.toString(),
         "lessonId"
       )) as Lesson;
 
       // check if user viewed the lesson
-      if (!lesson.viewed.includes(user._id.toString())) {
+      if (!lesson.viewed.includes(user.username)) {
         return false;
       }
 
       // if lesson has a quiz, check if user completed it
-      if (lesson.quiz && !lesson.quiz.completed.includes(user._id.toString())) {
+      if (lesson.quiz && !lesson.quiz.completed.includes(user.username)) {
         return false;
       }
     }
@@ -571,11 +571,14 @@ const methods = {
 
     // add completed enrolled courses to completed courses array
     for (let courseId of user.enrolledCourses) {
-      const isCompleted = await this.hasCompletedCourse(username, courseId);
+      const isCompleted = await this.hasCompletedCourse(
+        username,
+        courseId.toString()
+      );
       if (isCompleted) {
         let course = (await mongo.getDocById(
           courses,
-          courseId,
+          courseId.toString(),
           "courseId"
         )) as Course;
         completedCourses.push(course);
