@@ -100,7 +100,7 @@ export default function Lesson({ username }: { username: string }) {
               <div>
                 <h1>{data.courseTitle}</h1>
                 <h2>
-                  Lesson {lessonNum}: {data.title}
+                  Lesson {Number(lessonNum) + 1}: {data.title}
                 </h2>
                 <p>{data.description}</p>
                 {data.creator !== username ? null : (

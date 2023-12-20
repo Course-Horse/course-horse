@@ -5,11 +5,48 @@ import NavBar from "@/components/navbar/navbar";
 import styles from "@/styles/admin.module.scss";
 import { Button } from "react-bootstrap";
 import { useParams } from "next/navigation";
+import axios from "axios";
+import { parse } from "marked";
+import * as DOMPurify from "dompurify";
 
 export default function AdminView({ username }: { username: any }) {
   const { username: usernameQ } = useParams();
+  const [data, setData] = useState(null) as any;
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {}, []);
+  function fetchApplication() {
+    setLoading(true);
+    axios
+      .get(`/api/users/${usernameQ}`)
+      .then((res) => {
+        console.log(res);
+        setData(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function setStatusHandler(e: any) {
+    let status = e.target.value;
+    console.log(status);
+
+    axios
+      .post(`/api/applications/${usernameQ}`, { status })
+      .then((res) => {
+        console.log(res);
+        fetchApplication();
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Unable to set status.");
+      });
+  }
+
+  useEffect(() => {
+    fetchApplication();
+  }, []);
 
   return (
     <>
@@ -19,32 +56,92 @@ export default function AdminView({ username }: { username: any }) {
       </Head>
       <NavBar username={username} />
       <main className="pageContainer">
-        <h1>{usernameQ}&apos;s Application</h1>
+        {loading ? (
+          <h1>Loading...</h1>
+        ) : (
+          <>
+            <h1>{usernameQ}&apos;s Application</h1>
+            <div id="application" className={styles.application}>
+              <div
+                id="applicationDetails"
+                className={styles.applicationDetails}
+              >
+                <img src={data.profilePicture} alt="profile picture" />
+                <div>
+                  <h2>{data.username}</h2>
+                  <p>
+                    {data.firstName} {data.lastName}
+                  </p>
+                  <p>{data.email}</p>
+                </div>
 
-        <div id="application" className={styles.application}>
-          <div id="applicationDetails" className={styles.applicationDetails}>
-            <img src="/logo.png" alt="profile picture" />
-            <div>
-              <h2>username</h2>
-              <p>firstName lastName</p>
-              <p>email</p>
+                {!data.application ? (
+                  <div>
+                    <h3>No application available.</h3>
+                  </div>
+                ) : (
+                  <>
+                    <div className={styles.applicationContent}>
+                      <h3>Application Content</h3>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(
+                            parse(data.application.content) as any
+                          ) as any,
+                        }}
+                      ></div>
+                    </div>
+                    <div>
+                      <h3>Additional Documents</h3>
+                      <div>
+                        {data.application.documents.map(
+                          (document: any, index: number) => {
+                            return (
+                              <a key={index} href={document}>
+                                Document {index + 1}
+                              </a>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+              {data.application && (
+                <>
+                  <p>Current Status: {data.application.status}</p>
+                  <div
+                    id="applicationActions"
+                    className={styles.applicationActions}
+                  >
+                    <Button
+                      variant="success"
+                      value={"accepted"}
+                      onClick={setStatusHandler}
+                    >
+                      Accept Application
+                    </Button>
+                    <Button
+                      variant="warning"
+                      value={"pending"}
+                      onClick={setStatusHandler}
+                    >
+                      Set to Pending
+                    </Button>
+                    <Button
+                      variant="danger"
+                      value={"declined"}
+                      onClick={setStatusHandler}
+                    >
+                      Decline Application
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
-
-            <div className={styles.applicationContent}>
-              <h3>Application Content</h3>
-              <p>content from markdown</p>
-            </div>
-            <div>
-              <h3>Additional Documents</h3>
-              <div>list here</div>
-            </div>
-          </div>
-          <div id="applicationActions" className={styles.applicationActions}>
-            <Button variant="success">Accept Application</Button>
-            <Button variant="warning">Set to Pending</Button>
-            <Button variant="danger">Reject Application</Button>
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </>
   );

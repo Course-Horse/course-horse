@@ -20,7 +20,7 @@ function LessonPreview({
   return (
     <div>
       <h3>
-        Lesson {num}: {data.title}
+        Lesson {num + 1}: {data.title}
       </h3>
       <p>{data.description}</p>
       <div>
