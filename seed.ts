@@ -377,10 +377,6 @@ async function seeding(){
         'janeDoe123',
         pythonLesson1._id.toString()
     );
-    
-    await lessonData.deleteLesson(
-        webDevLesson1._id.toString()
-    );
 
     await lessonData.updateLesson(
         pythonLesson2._id.toString(),
