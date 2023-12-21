@@ -5,6 +5,7 @@ import axios from "axios";
 import $ from "jquery";
 import { Spinner } from "react-bootstrap";
 
+import utils from "@/utils";
 import auth from "@/auth/";
 import validator from "@/data/helpers/validator.js";
 import styles from "@/styles/signup.module.scss";
@@ -13,15 +14,10 @@ import NavBar from "@/components/navbar/navbar";
 export default function Signup({ username }: { username: any }) {
   const [loading, setLoading] = useState(false);
 
-  function submitHandler(e: any) {
+  function signup() {
     setLoading(true);
-    e.preventDefault();
-
-    let username;
-    let password;
-    let email;
-    let firstName;
-    let lastName;
+    // get and validate user inputs
+    let username, password, email, firstName, lastName;
     try {
       username = validator.checkUsername($("#username").val(), "username");
       password = validator.checkPassword($("#password").val(), "password");
@@ -37,7 +33,7 @@ export default function Signup({ username }: { username: any }) {
       setLoading(false);
       return;
     }
-
+    // submit signup
     axios
       .post(`/api/users`, {
         username,
@@ -51,12 +47,11 @@ export default function Signup({ username }: { username: any }) {
         window.location.href = "/signin";
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(
+          alert,
+          err,
+          "There was an error signing up. Please try again."
+        );
         setLoading(false);
       });
   }
@@ -74,7 +69,7 @@ export default function Signup({ username }: { username: any }) {
       <main className="pageContainer">
         <div className={styles.signinContainer}>
           <h1>Sign Up</h1>
-          <form onSubmit={submitHandler}>
+          <form onSubmit={utils.createHandler(signup)}>
             <div>
               <label htmlFor="username">Username</label>
               <input type="text" id="username" />

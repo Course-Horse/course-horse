@@ -16,7 +16,7 @@ export default function Home({ username }: { username: any }) {
       <NavBar username={username} />
       <main className="pageContainer">
         <div className={styles.header}>
-          <Image src="/logo.png" />
+          <Image src="/logo.png" alt="Course Horse Logo" />
           <h1>Course Horse</h1>
           <p>Your all-in-one online learning platform.</p>
         </div>
@@ -38,7 +38,7 @@ export default function Home({ username }: { username: any }) {
             </div>
           </div>
           <div>
-            <Image src="/horse.gif" />
+            <Image src="/horse.gif" alt="Horse Running Animation" />
           </div>
         </div>
       </main>

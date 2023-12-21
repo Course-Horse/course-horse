@@ -11,6 +11,7 @@ import auth from "@/auth/";
 import NavBar from "@/components/navbar/navbar";
 import TextInputList from "@/components/textInputList/textInputList";
 import { Button } from "react-bootstrap";
+import utils from "@/utils";
 
 export default function CreateLesson({ username }: { username: any }) {
   const { courseId } = useParams();
@@ -29,8 +30,8 @@ export default function CreateLesson({ username }: { username: any }) {
     setQuiz(quiz.slice(0, -1));
   }
 
-  function submitLesson(e: any) {
-    e.preventDefault();
+  function submitLesson() {
+    // get basic info inputs
     let title = $("#lessonName").val();
     let description = $("#lessonDescription").val();
     let content = $("#lessonContent").val();
@@ -41,20 +42,18 @@ export default function CreateLesson({ username }: { username: any }) {
         videoList.push(video.value);
       }
     }
-
-    let quiz = null;
-    let quizDescription = null;
+    // get quiz inputs and construct quizobj
+    let quizObj = undefined;
     if (hasQuiz) {
-      let questions = $("#quiz > div") as any;
+      let quizDescription = null;
       let questionList = [];
+      let questions = $("#quiz > div") as any;
       for (let question of questions) {
         let questionText = $(question).find("textarea").val();
         let answers = $(question).find(".answers input") as any;
         let answerList = [];
         for (let answer of answers) {
-          if (answer.value) {
-            answerList.push(answer.value);
-          }
+          answerList.push(answer.value);
         }
         let correctAnswer = $(question)
           .find(".correctAnswer input[type=number]")
@@ -65,45 +64,41 @@ export default function CreateLesson({ username }: { username: any }) {
           correctAnswer: Number(correctAnswer) - 1,
         });
       }
-      quiz = questionList;
       quizDescription = $("#quizDescription").val();
+      quizObj = {
+        description: quizDescription,
+        questions: questionList,
+        completed: [],
+      };
     }
-
-    console.log(title, description, content, videoList, quizDescription, quiz);
-
+    // validate inputs
     try {
       title = validator.checkString(title, "Lesson Name");
       description = validator.checkString(description, "Lesson Description");
       content = validator.checkString(content, "Lesson Content");
       videoList = validator.checkVideoStringArray(videoList, "Youtube Links");
-      if (hasQuiz) {
-        quizDescription = validator.checkString(quizDescription);
+      if (quizObj) {
+        quizObj = validator.checkQuiz(quizObj, "Quiz");
       }
     } catch (e) {
       alert(e);
       return;
     }
-
+    // make request
     axios
       .post(`/api/courses/${courseId}/create`, {
         title,
         description,
         content,
         videos: videoList,
-        quizDescription,
-        quiz,
+        quiz: quizObj,
       })
       .then((res) => {
         console.log(res);
         window.location.href = `/courses/${courseId}`;
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(alert, err, "Error creating lesson. Please try again");
       });
   }
 
@@ -119,7 +114,7 @@ export default function CreateLesson({ username }: { username: any }) {
         <form
           method="POST"
           className={verticalFormStyles.form}
-          onSubmit={submitLesson}
+          onSubmit={utils.createHandler(submitLesson)}
         >
           <div>
             <label htmlFor="lessonName">Lesson Name</label>

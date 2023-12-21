@@ -5,12 +5,14 @@ export default function CourseListing({
   coursePicture,
   tags,
   completed,
+  creator,
 }: any) {
   return (
     <a href={`/courses/${_id}`}>
       <img src={coursePicture} alt={`${title} Course Image`} />
       <div>
         <h3>{title}</h3>
+        <p>Created by {creator}</p>
         <p>Tags: {tags.join(", ")}</p>
         <p>{description}</p>
       </div>

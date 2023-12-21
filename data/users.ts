@@ -152,7 +152,7 @@ const methods = {
 
     // validate email
     if (fields.hasOwnProperty("email")) {
-      if (fields.email?.trim() !== new_user.email){
+      if (fields.email?.trim() !== new_user.email) {
         let emailTaken = false;
         try {
           await mongo.getDocByParam(
@@ -364,8 +364,14 @@ const methods = {
     }
 
     // validate and filter by application status if provided
-    statusFilter = validator.checkStringArray(statusFilter, "statusFilter");
+    query["application.status"] = { $in: ["accepted", "pending", "declined"] };
     if (statusFilter && statusFilter.length > 0) {
+      for (let i = 0; i < statusFilter.length; i++) {
+        statusFilter[i] = validator.checkStatus(
+          statusFilter[i],
+          "statusFilter"
+        );
+      }
       query["application.status"] = { $in: statusFilter };
     }
 
@@ -382,11 +388,8 @@ const methods = {
       .find(query)
       .sort(sortOptions)
       .toArray();
-    const applications = usersWithApplications.map(
-      (user: User) => user.application
-    );
 
-    return applications;
+    return usersWithApplications;
   },
 
   /**

@@ -4,7 +4,7 @@ import { Button, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-
+import utils from "@/utils";
 import headerStyle from "@/styles/header.module.scss";
 import styles from "@/styles/course.module.scss";
 import NavBar from "@/components/navbar/navbar";
@@ -48,30 +48,32 @@ export default function Course({ username }: { username: any }) {
   const [enrolled, setEnrolled] = useState(null);
 
   useEffect(() => {
-    if (courseId) {
-      axios
-        .get(`/api/courses/${courseId}`)
-        .then((res) => {
-          console.log(res);
-          setData(res.data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          alert("Unable to load course.");
-          window.location.href = "/courses";
-        })
-        .then(() => {
-          axios
-            .get(`/api/courses/${courseId}/enroll`)
-            .then((res) => {
-              console.log(res);
-              setEnrolled(res.data.enrolled);
-            })
-            .catch((err) => {
-              alert("Unable to load course enrollment status.");
-            });
-        });
-    }
+    // get course data
+    axios
+      .get(`/api/courses/${courseId}`)
+      .then((res) => {
+        console.log(res);
+        setData(res.data);
+        setLoading(false);
+        // get enrollment status
+        axios
+          .get(`/api/courses/${courseId}/enroll`)
+          .then((res) => {
+            console.log(res);
+            setEnrolled(res.data.enrolled);
+          })
+          .catch((err) => {
+            utils.alertError(
+              alert,
+              err,
+              "Unable to load course enrollment status."
+            );
+          });
+      })
+      .catch((err) => {
+        utils.alertError(alert, err, "Unable to load course.");
+        window.location.href = "/courses";
+      });
   }, [enrolled]);
 
   function deleteCourse() {
@@ -82,8 +84,7 @@ export default function Course({ username }: { username: any }) {
         window.location.href = "/courses";
       })
       .catch((err) => {
-        console.log(err);
-        alert("Unable to delete course.");
+        utils.alertError(alert, err, "Unable to delete course.");
       });
   }
 
@@ -95,8 +96,7 @@ export default function Course({ username }: { username: any }) {
         setEnrolled(res.data.enrolled);
       })
       .catch((err) => {
-        console.log(err);
-        alert("Unable to toggle enrollment of course.");
+        utils.alertError(alert, err, "Unable to toggle enrollment in course.");
       });
   }
 
@@ -122,6 +122,7 @@ export default function Course({ username }: { username: any }) {
 
               <div>
                 <h1>{data.title} </h1>
+                <p>Created by {data.creator}</p>
                 <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
 

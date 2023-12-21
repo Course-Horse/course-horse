@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import $ from "jquery";
 
+import utils from "@/utils";
 import validator from "@/data/helpers/validator.js";
 import auth from "@/auth/";
 import styles from "@/styles/courses.module.scss";
 import CourseList from "@/components/courseList/courselist";
 import NavBar from "@/components/navbar/navbar";
+import { Spinner } from "react-bootstrap";
 
 export default function Courses({ username }: { username: any }) {
   const [loadingMyCourses, setLoadingMyCourses] = useState(true);
@@ -16,43 +18,9 @@ export default function Courses({ username }: { username: any }) {
   const [Browse, setBrowse] = useState([]);
   const [completed, setCompleted] = useState(null) as any;
 
-  useEffect(() => {
-    axios
-      .get("/api/courses/mycourses")
-      .then((res) => {
-        console.log(res.data);
-        setMyCourses(res.data);
-        setLoadingMyCourses(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios
-      .get("/api/courses")
-      .then((res) => {
-        console.log(res.data);
-        setBrowse(res.data);
-        setLoadingBrowse(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios
-      .get("/api/courses/completed")
-      .then((res) => {
-        console.log(res.data);
-        setCompleted(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  function searchCourses(e: any) {
-    e.preventDefault();
-
+  function searchCourses() {
+    setLoadingBrowse(true);
+    // get user inputs
     let title = $("#title").val();
     let sortBy = $("#sortBy").val();
     let sortOrder = $("#sortOrder").val();
@@ -63,7 +31,18 @@ export default function Courses({ username }: { username: any }) {
         tagList.push(tag.value);
       }
     }
-
+    // validate inputs
+    try {
+      // title = validator.checkString(title, "title"); ignore title
+      sortBy = validator.checkSortByCourse(sortBy, "sortBy");
+      sortOrder = validator.checkSortOrder(sortOrder, "sortOrder");
+      tagList = validator.checkTagList(tagList, "tag list");
+    } catch (e) {
+      alert(e);
+      setLoadingBrowse(false);
+      return;
+    }
+    // send request
     axios
       .get("/api/courses/", {
         params: {
@@ -76,11 +55,45 @@ export default function Courses({ username }: { username: any }) {
       .then((res) => {
         console.log(res.data);
         setBrowse(res.data);
+        setLoadingBrowse(false);
       })
       .catch((err) => {
-        console.log(err);
+        utils.alertError(
+          alert,
+          err,
+          "Error searching courses. Please try again."
+        );
+        setLoadingBrowse(false);
       });
   }
+
+  useEffect(() => {
+    // get users created and enrolled courses
+    axios
+      .get("/api/courses/mycourses")
+      .then((res) => {
+        console.log(res.data);
+        setMyCourses(res.data);
+        setLoadingMyCourses(false);
+      })
+      .catch((err) => {
+        utils.alertError(alert, err, "Error getting your courses.");
+        window.location.href = "/profile";
+      });
+    // get courses to browse
+    searchCourses();
+    // get completed courses
+    axios
+      .get("/api/courses/completed")
+      .then((res) => {
+        console.log(res.data);
+        setCompleted(res.data);
+      })
+      .catch((err) => {
+        utils.alertError(alert, err, "Error getting completed courses.");
+        window.location.href = "/profile";
+      });
+  }, []);
 
   return (
     <>
@@ -95,7 +108,7 @@ export default function Courses({ username }: { username: any }) {
           <div>
             <h2>My Courses</h2>
             {loadingMyCourses ? (
-              <p>Loading...</p>
+              <Spinner />
             ) : myCourses.creator.length > 0 ? (
               <CourseList
                 courses={myCourses.creator}
@@ -110,14 +123,16 @@ export default function Courses({ username }: { username: any }) {
             <div>
               {completed && completed.tags.length > 0
                 ? completed.tags.length <= 3
-                  ? `Top ${completed.tags.length} tags: ${completed.tags.join(
-                      ", "
-                    )}`
-                  : `Top 3 tags: ${completed.tags.slice(0, 3).join(", ")}`
+                  ? `Top ${
+                      completed.tags.length
+                    } tags of completed courses: ${completed.tags.join(", ")}`
+                  : `Top 3 tags of completed courses: ${completed.tags
+                      .slice(0, 3)
+                      .join(", ")}`
                 : null}
             </div>
             {loadingMyCourses ? (
-              <p>Loading...</p>
+              <Spinner />
             ) : myCourses.enrolled.length > 0 ? (
               <CourseList
                 courses={myCourses.enrolled}
@@ -129,7 +144,7 @@ export default function Courses({ username }: { username: any }) {
           </div>
           <div className={styles.browse}>
             <h2>All Courses</h2>
-            <form onSubmit={searchCourses}>
+            <form onSubmit={utils.createHandler(searchCourses)}>
               <div>
                 <div>
                   <label htmlFor="title">Course Title</label>
@@ -151,7 +166,7 @@ export default function Courses({ username }: { username: any }) {
                 </div>
                 <div>
                   <label htmlFor="submit">Submit</label>
-                  <button id="submit" type="submit">
+                  <button id="submit" type="submit" disabled={loadingBrowse}>
                     Search
                   </button>
                 </div>
@@ -175,7 +190,7 @@ export default function Courses({ username }: { username: any }) {
             </form>
             <div>
               {loadingBrowse ? (
-                <p>Loading...</p>
+                <Spinner />
               ) : Browse.length > 0 ? (
                 <CourseList
                   courses={Browse}

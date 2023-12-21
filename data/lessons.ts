@@ -122,7 +122,7 @@ const methods = {
     videos = validator.checkVideoStringArray(videos, "videos");
 
     // check for quiz
-    let quiz_obj = quiz !== undefined ? quiz : null;
+    let quiz_obj = quiz !== undefined ? validator.checkQuiz(quiz) : null;
 
     // create lesson object
     let lesson = {
@@ -216,7 +216,7 @@ const methods = {
       lessonId,
       "lessonId"
     )) as Lesson;
-    
+
     // retrieve course from supplied lessonId
     let course = (await mongo.getDocById(
       courses,
@@ -409,9 +409,18 @@ const methods = {
       "user"
     )) as User;
 
+    let course = (await mongo.getDocById(
+      courses,
+      new_lesson.courseId,
+      "courseId"
+    )) as Course;
+
     // confirm user is enrolled in the course
-    if (!user.enrolledCourses.includes(new_lesson.courseId)) {
-      throw "user not enrolled in course";
+    if (
+      course.creator !== username &&
+      !user.enrolledCourses.includes(new_lesson.courseId)
+    ) {
+      throw "user not enrolled in course or the creator";
     }
 
     // validate message
@@ -421,7 +430,7 @@ const methods = {
     let message_obj: Message = {
       username: username,
       message: message,
-      created: new Date()
+      created: new Date(),
     };
 
     // update lesson with new discussion

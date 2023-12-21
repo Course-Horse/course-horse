@@ -1,24 +1,40 @@
 import Head from "next/head";
-
+import utils from "@/utils";
 import auth from "@/auth/";
 import TextInputList from "@/components/textInputList/textInputList";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import NavBar from "@/components/navbar/navbar";
 import $ from "jquery";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import validator from "@/data/helpers/validator.js";
+import { Spinner } from "react-bootstrap";
 
 export default function Apply({ username }: { username: any }) {
-  function submitApplication(e: any) {
-    e.preventDefault();
+  const [loading, setLoading] = useState(false);
+
+  function submitApplication() {
+    setLoading(true);
+    // get user inputs
     let applicationContent = $("#applicationContent").val();
     let documents = $("#documents input") as any;
     let documentsArr = [];
     for (let i = 0; i < documents.length; i++) {
       documentsArr.push(documents[i].value);
     }
-
-    console.log(applicationContent, documentsArr);
+    // validate user inputs
+    try {
+      applicationContent = validator.checkString(
+        applicationContent,
+        "Application Content"
+      );
+      documentsArr = validator.checkLinkStringArray(documentsArr, "Documents");
+    } catch (e) {
+      alert(e);
+      setLoading(false);
+      return;
+    }
+    // submit application
     axios
       .post(`/api/applications/`, {
         content: applicationContent,
@@ -30,25 +46,35 @@ export default function Apply({ username }: { username: any }) {
         window.location.href = "/profile";
       })
       .catch((err) => {
-        console.log(err);
-        alert("Unable to submit application.");
+        utils.alertError(
+          alert,
+          err,
+          "There was an error submitting your application. Please try again."
+        );
+        setLoading(false);
       });
   }
 
   useEffect(() => {
+    // get user data to check if they already have an application
     axios
       .get("/api/users/")
       .then((res) => {
         if (res.data.application) {
-          if (res.data.application.status == "pending")
+          if (res.data.application.status === "pending")
             alert("You already have a pending application.");
-          if (res.data.application.status == "accepted")
+          if (res.data.application.status === "accepted")
             alert("You are already an educator.");
           window.location.href = "/profile";
         }
       })
       .catch((err) => {
-        console.log(err);
+        utils.alertError(
+          alert,
+          err,
+          "There was an error getting your current application status."
+        );
+        window.location.href = "/";
       });
   }, []);
 
@@ -67,7 +93,7 @@ export default function Apply({ username }: { username: any }) {
         <form
           method="POST"
           className={verticalFormStyles.form}
-          onSubmit={submitApplication}
+          onSubmit={utils.createHandler(submitApplication)}
         >
           <div>
             <label htmlFor="applicationContent">Application Content</label>
@@ -86,6 +112,7 @@ export default function Apply({ username }: { username: any }) {
           <div>
             <label htmlFor="submit">Submit Application</label>
             <input id="submit" type="submit" value="Apply" />
+            {loading && <Spinner />}
           </div>
         </form>
       </main>

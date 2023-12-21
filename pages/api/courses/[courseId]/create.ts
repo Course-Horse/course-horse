@@ -34,53 +34,14 @@ export default async function handler(
   // CREATE LESSON
   if (method === "POST") {
     // get and validate user inputs
-    let { title, description, content, videos, quizDescription, quiz } =
-      req.body;
+    let { title, description, content, videos, quiz } = req.body;
     // validate basic inputs
     try {
       title = validator.checkString(title, "title");
       description = validator.checkString(description, "description");
       content = validator.checkString(content, "content");
       videos = validator.checkVideoStringArray(videos, "videos");
-    } catch (e) {
-      return res.status(400).json({ error: e });
-    }
-
-    // validate quiz inputs
-    // TODO: maybe make this a bit better?
-    let quiz_obj = undefined;
-    try {
-      if (quizDescription && quiz && quiz.length > 0) {
-        quizDescription = validator.checkString(
-          quizDescription,
-          "quizDescription"
-        );
-        for (let i = 0; i < quiz.length; i++) {
-          quiz[i].question = validator.checkString(
-            quiz[i].question,
-            `quiz[${i}].question`
-          );
-          quiz[i].answers = validator.checkStringArray(
-            quiz[i].answers,
-            `quiz[${i}].answers`
-          );
-          quiz[i].correctAnswer = validator.checkInt(
-            quiz[i].correctAnswer,
-            `quiz[${i}].correctAnswer`
-          );
-          if (
-            quiz[i].correctAnswer < 0 ||
-            quiz[i].correctAnswer >= quiz[i].answers.length
-          )
-            throw `a correct answer must be within bounds of the answers array`;
-        }
-
-        quiz_obj = {
-          description: quizDescription,
-          questions: quiz,
-          completed: [],
-        };
-      }
+      if (quiz !== undefined) quiz = validator.checkQuiz(quiz, "quiz");
     } catch (e) {
       return res.status(400).json({ error: e });
     }
@@ -94,7 +55,7 @@ export default async function handler(
         description,
         content,
         videos,
-        quiz_obj
+        quiz
       );
     } catch (e) {
       return res.status(500).json({ error: `Failed to create lesson.` });
