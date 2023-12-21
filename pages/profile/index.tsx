@@ -38,6 +38,7 @@ export default function MyProfile({ username }: { username: any }) {
     let profilePicture = $("#profilePicture")[0] as any;
     if (!profilePicture.files || !profilePicture.files[0]) {
       alert("You must provide a course image!");
+      setLoadingPic(false);
       return;
     }
     let reader = new FileReader();
@@ -139,9 +140,11 @@ export default function MyProfile({ username }: { username: any }) {
         password,
       })
       .then((res) => {
-        console.log(res);
         setData(res.data);
         setLoadingPassword(false);
+        alert("Successfully changed password!");
+        $("#password").val("");
+        $("#confirmPassword").val("");
       })
       .catch((err) => {
         utils.alertError(
