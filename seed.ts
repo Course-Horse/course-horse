@@ -402,37 +402,7 @@ async function seeding(){
         'Start your journey with JavaScript, the language of the web.',
         'This lesson covers the basics of JavaScript, including variables, data types, and simple functions...',
         ["https://www.youtube.com/embed/W6NZfCO5SIk?si=wg_IPDzBc9NiEKpT"],
-        {
-            description: "Quiz on Intro to JavaScript",
-            questions: [
-                {
-                    "question": "Which symbol is used to declare a variable in JavaScript?",
-                    "answers": ["var", "%", "#", "&"],
-                    "correctAnswer": 0
-                },
-                {
-                    "question": "Which of the following is a way to comment in JavaScript?",
-                    "answers": ["// This is a comment", "<!-- This is a comment -->", "# This is a comment", "/* This is a comment */"],
-                    "correctAnswer": 0
-                },
-                {
-                    "question": "How do you call a function named 'myFunction' in JavaScript?",
-                    "answers": ["call myFunction()", "myFunction[]", "myFunction()", "call function myFunction()"],
-                    "correctAnswer": 2
-                },
-                {
-                    "question": "What will this code return? `Boolean(10 > 9)`",
-                    "answers": ["true", "false", "'true'", "'false'"],
-                    "correctAnswer": 0
-                },
-                {
-                    "question": "Which method is used to parse a JSON string into an object?",
-                    "answers": ["JSON.parse()", "JSON.stringify()", "JSON.toObject()", "JSON.toArray()"],
-                    "correctAnswer": 0
-                }
-            ],
-            completed: []
-        }
+        undefined
     );
 
     const javascriptEssentialsLesson2 = await lessonData.createLesson(
@@ -502,8 +472,6 @@ async function seeding(){
     await lessonData.toggleQuizCompletedUsers('xxmistacruzxx', pythonLesson1._id.toString());
     await lessonData.toggleQuizCompletedUsers('xxmistacruzxx', pythonLesson2._id.toString());
     await lessonData.toggleQuizCompletedUsers('alextaylor789', pythonLesson1._id.toString());
-    await lessonData.toggleQuizCompletedUsers('janedoe123', javascriptEssentialsLesson1._id.toString());
-    await lessonData.toggleQuizCompletedUsers('johnsmith456', javascriptEssentialsLesson1._id.toString());
     await lessonData.toggleQuizCompletedUsers('johnsmith456', javascriptEssentialsLesson2._id.toString());
     await lessonData.toggleQuizCompletedUsers('alextaylor789', pythonLesson1._id.toString());
 
