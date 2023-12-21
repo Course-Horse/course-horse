@@ -9,15 +9,17 @@ import validator from "@/data/helpers/validator.js";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import NavBar from "@/components/navbar/navbar";
 import { Spinner } from "react-bootstrap";
+import utils from "@/utils";
 
 const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
 
 export default function EditCourse({ username }: { username: any }) {
+  const { courseId } = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null) as any;
-  const { courseId } = useParams();
 
   useEffect(() => {
+    // get course data
     axios
       .get(`/api/courses/${courseId}`)
       .then((res) => {
@@ -25,17 +27,13 @@ export default function EditCourse({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(alert, err, "Error loading course data.");
+        window.location.href = "/courses";
       });
   }, []);
 
-  function submitBasic(e: any) {
-    e.preventDefault();
+  function submitBasic() {
+    // get user inputs
     let title = $("#courseName").val();
     let description = $("#courseDescription").val();
     let tags = $("#tags div input") as any;
@@ -45,16 +43,16 @@ export default function EditCourse({ username }: { username: any }) {
         tagList.push(tag.value);
       }
     }
-
+    // validate inputs
     try {
       title = validator.checkString(title, "Course Name");
       description = validator.checkString(description, "Course Description");
-      tagList = validator.checkStringArray(tagList, "Tags");
+      tagList = validator.checkTagList(tagList, "Tags");
     } catch (e) {
       alert(e);
       return;
     }
-
+    // make request
     axios
       .post(`/api/courses/${courseId}`, {
         updateType: "basic",
@@ -64,37 +62,31 @@ export default function EditCourse({ username }: { username: any }) {
       })
       .then((res) => {
         console.log(res);
-        let courseId = res.data._id;
-        window.location.href = "/courses/" + courseId;
+        window.location.href = "/courses/" + res.data._id;
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(alert, err, "Error updating course. Please try again");
       });
   }
 
-  function submitPicture(e: any) {
-    e.preventDefault();
+  function submitPicture() {
+    // get course image
     let coursePicture = $("#courseImage")[0] as any;
     if (!coursePicture.files || !coursePicture.files[0]) {
       alert("You must provide a course image!");
       return;
     }
     let reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function () {
+      // validate course image
       coursePicture = reader.result;
-
       try {
         coursePicture = validator.checkImage(reader.result, "Course Image");
       } catch (e) {
         alert(e);
         return;
       }
-
+      // make request
       axios
         .post(`/api/courses/${courseId}`, {
           updateType: "picture",
@@ -102,16 +94,14 @@ export default function EditCourse({ username }: { username: any }) {
         })
         .then((res) => {
           console.log(res);
-          let courseId = res.data._id;
-          window.location.href = "/courses/" + courseId;
+          window.location.href = "/courses/" + res.data._id;
         })
         .catch((err) => {
-          console.log(err);
-          if (err.response && err.response.data) {
-            alert(err.response.data.error);
-          } else {
-            alert("error occurred please try again");
-          }
+          utils.alertError(
+            alert,
+            err,
+            "Error updating course. Please try again"
+          );
         });
     };
     reader.readAsDataURL(coursePicture.files[0]);
@@ -135,10 +125,10 @@ export default function EditCourse({ username }: { username: any }) {
             <form
               method="POST"
               className={verticalFormStyles.form}
-              onSubmit={submitPicture}
+              onSubmit={utils.createHandler(submitPicture)}
             >
               <h2>Change Course Picture</h2>
-              <img src={data.coursePicture} />
+              <img src={data.coursePicture} alt="Course Image" />
               <div>
                 <label htmlFor="courseImage">Course Image</label>
                 <input
@@ -156,7 +146,7 @@ export default function EditCourse({ username }: { username: any }) {
             <form
               method="POST"
               className={verticalFormStyles.form}
-              onSubmit={submitBasic}
+              onSubmit={utils.createHandler(submitBasic)}
             >
               <h2>Change Course Info</h2>
               <div>

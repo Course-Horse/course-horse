@@ -3,6 +3,7 @@ import Head from "next/head";
 import $ from "jquery";
 import axios from "axios";
 
+import utils from "@/utils";
 import validator from "@/data/helpers/validator.js";
 import auth from "@/auth/";
 import styles from "@/styles/profile.module.scss";
@@ -18,6 +19,7 @@ export default function MyProfile({ username }: { username: any }) {
   const [data, setData] = useState(null) as any;
 
   useEffect(() => {
+    // get user data to populate profile page
     axios
       .get(`/api/users/`)
       .then((res) => {
@@ -25,27 +27,23 @@ export default function MyProfile({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(alert, err, "Error getting your user data.");
+        window.location.href = "/";
       });
   }, []);
 
-  async function submitProfilePicture(e: any) {
-    e.preventDefault();
+  function changeProfilePicture() {
+    setLoadingPic(true);
+    // get user inputs
     let profilePicture = $("#profilePicture")[0] as any;
     if (!profilePicture.files || !profilePicture.files[0]) {
       alert("You must provide a course image!");
       return;
     }
     let reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function () {
+      // validate user inputs
       profilePicture = reader.result;
-      console.log(profilePicture);
-
       try {
         profilePicture = validator.checkImage(
           profilePicture,
@@ -53,9 +51,11 @@ export default function MyProfile({ username }: { username: any }) {
         );
       } catch (e) {
         alert(e);
+        setLoadingPic(false);
         return;
       }
 
+      // make request
       axios
         .post(`/api/users/${username}`, {
           updateType: "picture",
@@ -63,38 +63,36 @@ export default function MyProfile({ username }: { username: any }) {
         })
         .then((res) => {
           console.log(res);
-          window.location.href = "/profile/";
+          setData(res.data);
+          setLoadingPic(false);
         })
-        .catch((err) => {
-          console.log(err);
-          if (err.response && err.response.data) {
-            alert(err.response.data.error);
-          } else {
-            alert("error occurred please try again");
-          }
+        .catch((err: any) => {
+          utils.alertError(
+            alert,
+            err,
+            "Error updating your profile picture. Please try again."
+          );
+          setLoadingPic(false);
         });
     };
     reader.readAsDataURL(profilePicture.files[0]);
   }
 
-  async function submitPersonal(e: any) {
-    e.preventDefault();
+  function submitPersonal() {
     setLoadingPersonal(true);
-    // GET INPUTS AND CLIENT SIDE VALIDATE
-    let firstName = $("#firstName").val();
-    let lastName = $("#lastName").val();
-    let email = $("#email").val();
+    // get and validate user inputs
+    let firstName, lastName, email;
     try {
-      firstName = validator.checkName(firstName, "first name");
-      lastName = validator.checkName(lastName, "last name");
-      email = validator.checkEmail(email, "email");
+      firstName = validator.checkName($("#firstName").val(), "first name");
+      lastName = validator.checkName($("#lastName").val(), "last name");
+      email = validator.checkEmail($("#email").val(), "email");
     } catch (e) {
-      setLoadingPersonal(false);
       alert(e);
+      setLoadingPersonal(false);
       return;
     }
 
-    // MAKE REQUEST
+    // make request
     axios
       .post(`/api/users/${username}`, {
         updateType: "personal",
@@ -103,28 +101,34 @@ export default function MyProfile({ username }: { username: any }) {
         email,
       })
       .then((res) => {
-        window.location.href = "/profile";
+        console.log(res);
+        setData(res.data);
+        setLoadingPersonal(false);
       })
       .catch((err) => {
+        utils.alertError(
+          alert,
+          err,
+          "Error updating your personal info. Please try again."
+        );
         setLoadingPersonal(false);
-        console.log(err);
-        if (err.response && err.response.data) alert(err.response.data.error);
-        else alert("error occurred please try again");
       });
   }
 
-  async function submitPassword(e: any) {
-    e.preventDefault();
+  function submitPassword() {
     setLoadingPassword(true);
     // GET INPUTS AND CLIENT SIDE VALIDATE
-    let password = $("#password").val();
+    let password, confirmPassword;
     try {
-      password = validator.checkPassword(password, "password");
-      let confirmPassword = $("#confirmPassword").val();
+      password = validator.checkPassword($("#password").val(), "password");
+      confirmPassword = validator.checkPassword(
+        $("#confirmPassword").val(),
+        "confirm password"
+      );
       if (password !== confirmPassword) throw "Passwords do not match";
     } catch (e) {
-      setLoadingPassword(true);
       alert(e);
+      setLoadingPassword(false);
       return;
     }
 
@@ -135,30 +139,29 @@ export default function MyProfile({ username }: { username: any }) {
         password,
       })
       .then((res) => {
-        window.location.href = "/profile";
+        console.log(res);
+        setData(res.data);
+        setLoadingPassword(false);
       })
       .catch((err) => {
-        setLoadingPassword(true);
-        console.log(err);
-        if (err.response && err.response.data) alert(err.response.data.error);
-        else alert("error occurred please try again");
+        utils.alertError(
+          alert,
+          err,
+          "Error updating your password. Please try again."
+        );
+        setLoadingPassword(false);
       });
   }
 
-  async function signoutHandler(e: any) {
-    e.preventDefault();
+  async function signout() {
     axios
       .get(`/api/signout/`)
       .then((res) => {
-        window.location.href = "/signin";
+        console.log(res);
+        window.location.href = "/";
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(alert, err, "Error signing out. Please try again.");
       });
   }
 
@@ -170,14 +173,17 @@ export default function MyProfile({ username }: { username: any }) {
       </Head>
       <NavBar username={username} />
       <main className="pageContainer">
-        <h1>My Profile {loading ? <Spinner /> : null}</h1>
-
-        {loading ? null : (
+        <h1>My Profile</h1>
+        {loading ? (
+          <div>
+            <Spinner />
+          </div>
+        ) : (
           <>
             <div className={styles.profile}>
               <div>
-                <img src={data.profilePicture} />
-                <form onSubmit={submitProfilePicture}>
+                <img src={data.profilePicture} alt="Your Profile Picture" />
+                <form onSubmit={utils.createHandler(changeProfilePicture)}>
                   <input
                     id="profilePicture"
                     type="file"
@@ -185,7 +191,12 @@ export default function MyProfile({ username }: { username: any }) {
                   />
                   <p>1MB Limit</p>
                   <label htmlFor="submitPicture">Change Profile Picture</label>
-                  <input id="submitPicture" type="submit" value="Upload" />
+                  <input
+                    id="submitPicture"
+                    type="submit"
+                    value="Upload"
+                    disabled={loadingPic}
+                  />
                   {loadingPic ? (
                     <Spinner style={{ alignSelf: "center" }} />
                   ) : null}
@@ -193,7 +204,7 @@ export default function MyProfile({ username }: { username: any }) {
               </div>
               <div>
                 <h2>{data.username}</h2>
-                <form onSubmit={submitPersonal}>
+                <form onSubmit={utils.createHandler(submitPersonal)}>
                   <h3>Personal Information</h3>
                   <label htmlFor="firstName">First Name</label>
                   <input
@@ -220,7 +231,7 @@ export default function MyProfile({ username }: { username: any }) {
                     <Spinner style={{ alignSelf: "center" }} />
                   ) : null}
                 </form>
-                <form onSubmit={submitPassword}>
+                <form onSubmit={utils.createHandler(submitPassword)}>
                   <h3>Change Password</h3>
                   <label htmlFor="password">New Password</label>
                   <input type="password" id="password" />
@@ -245,7 +256,7 @@ export default function MyProfile({ username }: { username: any }) {
           </>
         )}
 
-        <button onClick={signoutHandler}>Sign Out</button>
+        <button onClick={utils.createHandler(signout)}>Sign Out</button>
       </main>
     </>
   );

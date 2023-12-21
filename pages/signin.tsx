@@ -1,11 +1,11 @@
-import { useRef } from "react";
 import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import Router from "next/router";
 import axios from "axios";
+import $ from "jquery";
 import { Spinner } from "react-bootstrap";
 
+import utils from "@/utils";
 import NavBar from "@/components/navbar/navbar";
 import auth from "@/auth/";
 import styles from "@/styles/signin.module.scss";
@@ -13,39 +13,35 @@ import validator from "@/data/helpers/validator.js";
 
 export default function Signin({ username }: { username: any }) {
   const [loading, setLoading] = useState(false);
-  const usernamei = useRef("");
-  const password = useRef("");
 
-  async function submitHandler(e: any) {
-    e.preventDefault();
+  async function signin() {
     setLoading(true);
+    // get and validate user inputs
+    let usernamei, password;
     try {
-      usernamei.current = validator.checkUsername(
-        usernamei.current,
-        "username"
-      );
-      password.current = validator.checkPassword(password.current, "password");
+      usernamei = validator.checkUsername($("#username").val(), "username");
+      password = validator.checkPassword($("#password").val(), "password");
     } catch (e) {
-      setLoading(false);
       alert(e);
+      setLoading(false);
       return;
     }
-
+    // submit signin
     axios
       .post(`/api/signin`, {
-        username: usernamei.current,
-        password: password.current,
+        username: usernamei,
+        password: password,
       })
       .then((res) => {
-        Router.push("/");
+        console.log(res);
+        window.location.href = "/profile";
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(
+          alert,
+          err,
+          "There was an error signing in. Please try again."
+        );
         setLoading(false);
       });
   }
@@ -53,7 +49,7 @@ export default function Signin({ username }: { username: any }) {
   return (
     <>
       <Head>
-        <title>Signin | Course Horse</title>
+        <title>Sign In | Course Horse</title>
         <meta
           name="description"
           content="Sign in to your Course Horse account."
@@ -63,22 +59,14 @@ export default function Signin({ username }: { username: any }) {
       <main className="pageContainer">
         <div className={styles.signinContainer}>
           <h1>Sign in</h1>
-          <form onSubmit={submitHandler}>
+          <form onSubmit={utils.createHandler(signin)}>
             <div>
               <label htmlFor="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                onChange={(e) => (usernamei.current = e.target.value)}
-              />
+              <input type="text" id="username" />
             </div>
             <div>
               <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                onChange={(e) => (password.current = e.target.value)}
-              />
+              <input type="password" id="password" />
             </div>
             <button type="submit" disabled={loading}>
               Sign in

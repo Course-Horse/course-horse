@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import axios from "axios";
 import { parse } from "marked";
 import * as DOMPurify from "dompurify";
+import utils from "@/utils";
 
 export default function AdminView({ username }: { username: any }) {
   const { username: usernameQ } = useParams();
@@ -16,6 +17,7 @@ export default function AdminView({ username }: { username: any }) {
 
   function fetchApplication() {
     setLoading(true);
+    // make request
     axios
       .get(`/api/users/${usernameQ}`)
       .then((res) => {
@@ -24,14 +26,14 @@ export default function AdminView({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        utils.alertError(alert, err, "Failed to fetch user");
+        window.location.href = "/admin";
       });
   }
 
   function setStatusHandler(e: any) {
     let status = e.target.value;
-    console.log(status);
-
+    // make request
     axios
       .post(`/api/applications/${usernameQ}`, { status })
       .then((res) => {
@@ -39,12 +41,12 @@ export default function AdminView({ username }: { username: any }) {
         fetchApplication();
       })
       .catch((err) => {
-        console.log(err);
-        alert("Unable to set status.");
+        utils.alertError(alert, err, "Failed to update application status");
       });
   }
 
   useEffect(() => {
+    // get user info
     fetchApplication();
   }, []);
 

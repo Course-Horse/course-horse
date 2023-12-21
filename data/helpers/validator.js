@@ -1,5 +1,15 @@
 const exportedMethods = {
-  TAGS: ["math", "science", "english", "history", "art", "music", "technology", "engineering", "other"],
+  TAGS: [
+    "math",
+    "science",
+    "english",
+    "history",
+    "art",
+    "music",
+    "technology",
+    "engineering",
+    "other",
+  ],
   STATUSES: ["pending", "accepted", "declined"],
 
   checkString(strVal, varName) {
@@ -13,15 +23,45 @@ const exportedMethods = {
     return strVal;
   },
 
-  checkQuiz(quizVal, varName) {
-    if (!quizVal) throw `You must supply a ${varName}!`;
-    if (typeof quizVal.description !== "string")
-      throw `${varName} must have a string property 'description'!`;
-    if (!Array.isArray(quizVal.questions))
-      throw `${varName} must have an array property 'questions'!`;
-    if (!Array.isArray(quizVal.completed))
-      throw `${varName} must have an array property 'completed' with string elements!`;
-    return quizVal;
+  checkQuiz(quiz, varName) {
+    // validate description
+    quiz.description = this.checkString(quiz.description, "quiz description");
+    // validate questions
+    if (
+      !(
+        quiz.questions &&
+        Array.isArray(quiz.questions) &&
+        quiz.questions.length > 0
+      )
+    ) {
+      throw "You must supply an array of questions";
+    }
+    for (let question of quiz.questions) {
+      question.question = this.checkString(
+        question.question,
+        "question question"
+      );
+      question.answers = this.checkStringArray(
+        question.answers,
+        "question answers"
+      );
+      if (question.answers.length < 2) {
+        throw "question must have at least 2 answers";
+      }
+      question.correctAnswer = this.checkInt(
+        question.correctAnswer,
+        "question correct answer"
+      );
+      // validate correctAnswer
+      if (
+        question.correctAnswer < 0 ||
+        question.correctAnswer >= question.answers.length
+      ) {
+        throw "correct answer index is out of bounds";
+      }
+    }
+
+    return quiz;
   },
 
   checkStatus(strVal, varName) {

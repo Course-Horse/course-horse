@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import $ from "jquery";
 import axios from "axios";
 
-import validator from "@/data/helpers/validator.js";
+import utils from "@/utils";
 import auth from "@/auth/";
 import styles from "@/styles/profile.module.scss";
 import { Spinner } from "react-bootstrap";
@@ -23,21 +22,16 @@ export default function MyProfile({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        if (err.response && err.response.data) {
-          alert(err.response.data.error);
-          window.location.href = "/profile";
-        } else {
-          alert("error occurred please try again");
-        }
+        utils.alertError(alert, err, "Error getting user data.");
+        window.location.href = "/profile";
       });
   }, []);
 
   return (
     <>
       <Head>
-        <title>My Profile | Course Horse</title>
-        <meta name="description" content="View your profile on Course Horse." />
+        <title>Profile | Course Horse</title>
+        <meta name="description" content="View a profile on Course Horse." />
       </Head>
       <NavBar username={username} />
       <main className="pageContainer">
@@ -47,7 +41,7 @@ export default function MyProfile({ username }: { username: any }) {
           </div>
         ) : (
           <div className={styles.publicProfile}>
-            <img src={data.profilePicture} />
+            <img src={data.profilePicture} alt="Profile Picture" />
             <h1>{thisUsername}</h1>
             <p>{data.email}</p>
             <p>{`${data.firstName} ${data.lastName}`}</p>

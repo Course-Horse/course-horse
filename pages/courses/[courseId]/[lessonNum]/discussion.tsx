@@ -7,6 +7,7 @@ import { Spinner } from "react-bootstrap";
 import axios from "axios";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import styles from "@/styles/discussion.module.scss";
+import utils from "@/utils";
 
 export default function Discussion({ username }: { username: any }) {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function Discussion({ username }: { username: any }) {
   const [data, setData] = useState(null) as any;
 
   useEffect(() => {
+    // get discussion data
     axios
       .get(`/api/courses/${courseId}/${lessonNum}/discussion`)
       .then((res) => {
@@ -23,8 +25,7 @@ export default function Discussion({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        alert(err.response.data.error);
+        utils.alertError(alert, err, "Failed to load discussion");
         window.location.href = `/courses/${courseId}`;
       });
   }, []);
@@ -37,11 +38,10 @@ export default function Discussion({ username }: { username: any }) {
         message: message,
       })
       .then((res) => {
-        console.log(res);
-        window.location.reload();
+        setData(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        utils.alertError(alert, err, "Failed to post message");
       });
   }
 

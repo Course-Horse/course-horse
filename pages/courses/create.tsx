@@ -1,27 +1,28 @@
 import Head from "next/head";
 import $ from "jquery";
-
+import { useState } from "react";
 import validator from "@/data/helpers/validator.js";
 import auth from "@/auth/";
 import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import NavBar from "@/components/navbar/navbar";
 import axios from "axios";
-
-const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
+import utils from "@/utils";
+import { Spinner } from "react-bootstrap";
 
 export default function CreateCourse({ username }: { username: any }) {
-  function submitCourse(e: any) {
-    e.preventDefault();
+  const [loading, setLoading] = useState(false);
 
+  function submitCourse() {
+    // get course image
     let coursePicture = $("#courseImage")[0] as any;
     if (!coursePicture.files || !coursePicture.files[0]) {
       alert("You must provide a course image!");
       return;
     }
     let reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function () {
       coursePicture = reader.result;
-
+      // get all other inputs
       let title = $("#courseName").val();
       let description = $("#courseDescription").val();
       let tags = $("#tags div input") as any;
@@ -31,18 +32,18 @@ export default function CreateCourse({ username }: { username: any }) {
           tagList.push(tag.value);
         }
       }
-
+      // validate inputs
       try {
         title = validator.checkString(title, "Course Name");
-        console.log(reader.result);
         coursePicture = validator.checkImage(reader.result, "Course Image");
         description = validator.checkString(description, "Course Description");
-        tagList = validator.checkStringArray(tagList, "Tags");
+        tagList = validator.checkTagList(tagList, "Tags");
       } catch (e) {
         alert(e);
+        setLoading(false);
         return;
       }
-
+      // make request
       axios
         .post("/api/courses/", {
           title,
@@ -52,16 +53,15 @@ export default function CreateCourse({ username }: { username: any }) {
         })
         .then((res) => {
           console.log(res);
-          let courseId = res.data._id;
-          window.location.href = "/courses/" + courseId;
+          window.location.href = "/courses/" + res.data._id;
         })
         .catch((err) => {
-          console.log(err);
-          if (err.response && err.response.data) {
-            alert(err.response.data.error);
-          } else {
-            alert("error occurred please try again");
-          }
+          utils.alertError(
+            alert,
+            err,
+            "Failed to create course. Please try again."
+          );
+          setLoading(false);
         });
     };
     reader.readAsDataURL(coursePicture.files[0]);
@@ -79,7 +79,7 @@ export default function CreateCourse({ username }: { username: any }) {
         <form
           method="POST"
           className={verticalFormStyles.form}
-          onSubmit={submitCourse}
+          onSubmit={utils.createHandler(submitCourse)}
         >
           <div>
             <label htmlFor="courseName">Course Name</label>
@@ -113,8 +113,18 @@ export default function CreateCourse({ username }: { username: any }) {
           </div>
           <div>
             <label htmlFor="subtmit">Submit</label>
-            <input id="submit" type="submit" value="Create Course" />
+            <input
+              id="submit"
+              type="submit"
+              value="Create Course"
+              disabled={loading}
+            />
           </div>
+          {loading && (
+            <div>
+              <Spinner />
+            </div>
+          )}
         </form>
       </main>
     </>

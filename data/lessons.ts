@@ -66,42 +66,6 @@ const methods = {
   },
 
   /**
-   * Validates a quiz object
-   * @param {Quiz} quiz object to be validated
-   * @returns {Promise<string[]>} Promise object that resolves to a quiz object
-   */
-  async validateQuiz(quiz: Quiz): Promise<Quiz> {
-    // validate description
-    quiz.description = validator.checkString(quiz.description, "quiz.description");
-
-    // validate questions
-    for (let question of quiz.questions) {
-      question.question = validator.checkString(
-        question.question,
-        "question.question"
-      );
-      question.answers = validator.checkStringArray(
-        question.answers,
-        "question.answers"
-      );
-      question.correctAnswer = validator.checkNum(
-        question.correctAnswer,
-        "question.correctAnswer"
-      );
-
-      // validate correctAnswer
-      if (
-        question.correctAnswer < 0 ||
-        question.correctAnswer >= question.answers.length
-      ) {
-        throw "correct answer index is out of bounds";
-      }
-    }
-
-    return quiz;
-  },
-
-  /**
    * Gets a lesson with a specific id
    * @param {string} lessonId of the lesson to retrieve
    * @returns {Promise<Lesson>} Promise object that resolves to a lesson object
@@ -158,7 +122,7 @@ const methods = {
     videos = validator.checkVideoStringArray(videos, "videos");
 
     // check for quiz
-    let quiz_obj = quiz !== undefined ? quiz : null;
+    let quiz_obj = quiz !== undefined ? validator.checkQuiz(quiz) : null;
 
     // create lesson object
     let lesson = {
@@ -445,9 +409,18 @@ const methods = {
       "user"
     )) as User;
 
+    let course = (await mongo.getDocById(
+      courses,
+      new_lesson.courseId,
+      "courseId"
+    )) as Course;
+
     // confirm user is enrolled in the course
-    if (!user.enrolledCourses.includes(new_lesson.courseId)) {
-      throw "user not enrolled in course";
+    if (
+      course.creator !== username &&
+      !user.enrolledCourses.includes(new_lesson.courseId)
+    ) {
+      throw "user not enrolled in course or the creator";
     }
 
     // validate message

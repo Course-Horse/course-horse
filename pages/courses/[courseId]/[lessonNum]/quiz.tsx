@@ -5,6 +5,7 @@ import auth from "@/auth/";
 import { Button, Spinner } from "react-bootstrap";
 import axios from "axios";
 import styles from "@/styles/quiz.module.scss";
+import utils from "@/utils";
 
 export default function Quiz({ username }: { username: any }) {
   const router = useRouter();
@@ -13,11 +14,14 @@ export default function Quiz({ username }: { username: any }) {
   const [data, setData] = useState(null) as any;
 
   useEffect(() => {
+    // get lesson data for quiz
     axios
       .get(`/api/courses/${courseId}/${lessonNum}`)
       .then((res) => {
         console.log(res.data);
+        // redirect if there's no quiz
         if (!res.data.quiz) {
+          alert("This lesson has no quiz");
           window.location.href = `/courses/${courseId}/${lessonNum}`;
         }
         if (res.data.quiz.completed.includes(username)) {
@@ -28,12 +32,13 @@ export default function Quiz({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        setLoading(false);
+        utils.alertError(alert, err, "Failed to load quiz");
+        window.location.href = `/courses/${courseId}/${lessonNum}`;
       });
   }, []);
 
-  function submitQuiz(e: any) {
+  function submitQuiz() {
+    // get answers
     let answers = [];
     for (let i = 0; i < data.quiz.questions.length; i++) {
       let question = data.quiz.questions[i];
@@ -48,8 +53,7 @@ export default function Quiz({ username }: { username: any }) {
       alert("Please answer all questions");
       return;
     }
-    console.log(answers);
-
+    // make request
     axios
       .post(`/api/courses/${courseId}/${lessonNum}/quiz`, { answers })
       .then((res) => {
@@ -58,8 +62,7 @@ export default function Quiz({ username }: { username: any }) {
         window.location.href = `/courses/${courseId}/${lessonNum}`;
       })
       .catch((err) => {
-        console.log(err);
-        alert("Failed to submit quiz.");
+        utils.alertError(alert, err, "Failed to submit quiz");
       });
   }
 
@@ -110,7 +113,9 @@ export default function Quiz({ username }: { username: any }) {
                 }
               )}
               <div hidden={username === data.creator}>
-                <Button onClick={submitQuiz}>Submit Quiz</Button>
+                <Button onClick={utils.createHandler(submitQuiz)}>
+                  Submit Quiz
+                </Button>
               </div>
             </form>
           </>

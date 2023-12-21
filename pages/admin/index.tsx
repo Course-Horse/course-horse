@@ -2,19 +2,20 @@ import Head from "next/head";
 import axios from "axios";
 import auth from "@/auth/";
 import validator from "@/data/helpers/validator.js";
-import verticalFormStyles from "@/styles/verticalForm.module.scss";
 import { useEffect, useState } from "react";
 import NavBar from "@/components/navbar/navbar";
 import styles from "@/styles/admin.module.scss";
 import $ from "jquery";
 import Link from "next/link";
 import { Spinner } from "react-bootstrap";
+import utils from "@/utils";
 
 export default function Admin({ username }: { username: any }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]) as any;
 
   function searchApplications() {
+    // get search inputs
     let usernameQ = $("#usernameQ").val();
     let sortBy = $("#sortBy").val();
     let sortOrder = $("#sortOrder").val();
@@ -25,9 +26,8 @@ export default function Admin({ username }: { username: any }) {
         statusList.push(status.value);
       }
     }
-
     console.log(usernameQ, sortBy, sortOrder, statusList);
-
+    // make request
     axios
       .get("/api/applications/", {
         params: {
@@ -43,18 +43,14 @@ export default function Admin({ username }: { username: any }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        utils.alertError(alert, err, "Failed to search applications");
       });
   }
 
   useEffect(() => {
+    // get applications
     searchApplications();
   }, []);
-
-  function searchApplicationsHandler(e: any) {
-    e.preventDefault();
-    searchApplications();
-  }
 
   return (
     <>
@@ -66,7 +62,7 @@ export default function Admin({ username }: { username: any }) {
       <main className="pageContainer">
         <h1>Browse Applications</h1>
         <div className={styles.browse}>
-          <form onSubmit={searchApplicationsHandler}>
+          <form onSubmit={utils.createHandler(searchApplications)}>
             <div>
               <div>
                 <label htmlFor="usernameQ">Username</label>

@@ -53,6 +53,7 @@ export default async function handler(
 
     // attempt to get applications
     let result;
+    console.log(applicationParams);
     try {
       result = await userData.getApplications(
         applicationParams.usernameQuery,
