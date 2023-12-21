@@ -109,13 +109,13 @@ const exportedMethods = {
       };
 
     if (has)
-      if (user.application !== null && user.application.status === "approved")
+      if (user.application !== null && user.application.status === "accepted")
         return {
           props: result,
         };
       else if (
         user.application === null ||
-        user.application.status !== "approved"
+        user.application.status !== "accepted"
       )
         return {
           props: result,
