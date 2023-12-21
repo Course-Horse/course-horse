@@ -103,7 +103,9 @@ export default function Lesson({ username }: { username: string }) {
 
               <div>
                 <h1>{data.courseTitle}</h1>
-                <p>Created by {data.creator}</p>
+                <p>
+                  Created by <Link href={data.creator}>{data.creator}</Link>
+                </p>
                 <h2>
                   Lesson {Number(lessonNum) + 1}: {data.title}
                 </h2>

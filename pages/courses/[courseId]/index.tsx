@@ -137,7 +137,9 @@ export default function Course({ username }: { username: any }) {
 
               <div>
                 <h1>{data.title} </h1>
-                <p>Created by {data.creator}</p>
+                <p>
+                  Created by <Link href={data.creator}>{data.creator}</Link>
+                </p>
                 <p>Tags: {data.tags.join(", ")}</p>
                 <p>{data.description}</p>
 
