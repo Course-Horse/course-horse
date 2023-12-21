@@ -20,12 +20,14 @@ function LessonPreview({
   data: any;
   username: string;
 }) {
+  console.log(username);
+
   return (
     <div>
       <h3>
         Lesson {num + 1}: {data.title}
       </h3>
-      {data.creator !== username && (
+      {data.creator !== username ? null : (
         <p style={{ margin: "0px" }}>
           {data.viewed.includes(username) &&
           (data.quiz === null || data.quiz.completed.includes(username))

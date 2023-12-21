@@ -177,6 +177,10 @@ export default function CreateLesson({ username }: { username: any }) {
                         placeholder="Correct Answer"
                         min={1}
                       />
+                      <p>
+                        Tip: Correct answer corresponds to which # answer you're
+                        referring to.
+                      </p>
                     </div>
                   </div>
                 );
