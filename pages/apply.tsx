@@ -61,6 +61,7 @@ export default function Apply({ username }: { username: any }) {
       .get("/api/users/")
       .then((res) => {
         if (res.data.application) {
+          if (res.data.application.status === "declined") return;
           if (res.data.application.status === "pending")
             alert("You already have a pending application.");
           if (res.data.application.status === "accepted")

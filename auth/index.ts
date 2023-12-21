@@ -93,7 +93,7 @@ const exportedMethods = {
     let username = session.username;
     let result = {} as any;
     if (username) result.username = username;
-
+    // redirect if not signed in
     if (!username)
       return {
         redirect: {
@@ -101,26 +101,30 @@ const exportedMethods = {
           permanent: false,
         },
       };
-
+    // if admin, continue
     const user = await userData.getUser(username);
     if (user.admin === true)
       return {
         props: result,
       };
-
-    if (has)
-      if (user.application !== null && user.application.status === "accepted")
+    // user should be redirected if they are an educator
+    if (has) {
+      if (user.application && user.application.status === "accepted")
         return {
-          props: result,
+          redirect: {
+            destination: redirect,
+            permanent: false,
+          },
         };
-      else if (
-        user.application === null ||
-        user.application.status !== "accepted"
-      )
-        return {
-          props: result,
-        };
-
+      return {
+        props: result,
+      };
+    }
+    // user should be redirected if they are not an educator
+    if (user.application && user.application.status === "accepted")
+      return {
+        props: result,
+      };
     return {
       redirect: {
         destination: redirect,
