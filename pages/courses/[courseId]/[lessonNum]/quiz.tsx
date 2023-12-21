@@ -6,6 +6,7 @@ import { Button, Spinner } from "react-bootstrap";
 import axios from "axios";
 import styles from "@/styles/quiz.module.scss";
 import utils from "@/utils";
+import Head from "next/head";
 
 export default function Quiz({ username }: { username: any }) {
   const router = useRouter();
@@ -68,6 +69,10 @@ export default function Quiz({ username }: { username: any }) {
 
   return (
     <>
+      <Head>
+        <title>Quiz | Course Horse</title>
+        <meta name="description" content="Take a quiz on Course Horse." />
+      </Head>
       <NavBar username={username} />
       <main className="pageContainer">
         {loading ? (

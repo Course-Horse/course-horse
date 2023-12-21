@@ -84,8 +84,8 @@ export default function Lesson({ username }: { username: string }) {
   return (
     <>
       <Head>
-        <title>Course | Course Horse</title>
-        <meta name="description" content="View a course on Course Horse." />
+        <title>Lesson | Course Horse</title>
+        <meta name="description" content="View a lesson on Course Horse." />
       </Head>
       <NavBar username={username} />
       <main className="pageContainer">
