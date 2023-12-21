@@ -13,6 +13,11 @@ export default async function handler(
     return res
       .status(403)
       .json({ error: "Seeding is not allowed on this server." });
-  await seeding();
+  try {
+    await seeding();
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+
   res.status(200).json({ Seeded: "Yes!" });
 }

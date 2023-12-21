@@ -41,6 +41,7 @@ export default async function handler(
       email: user.email,
       profilePicture: user.profilePicture,
       application: user.application,
+      bio: user.bio,
     });
   }
 
@@ -54,11 +55,12 @@ export default async function handler(
     // UPDATE PERSONAL INFORMATION
     if (updateType === "personal") {
       // get and validate input data
-      let { firstName, lastName, email } = req.body;
+      let { firstName, lastName, email, bio } = req.body;
       try {
         firstName = validator.checkName(firstName, "firstName");
         lastName = validator.checkName(lastName, "lastName");
         email = validator.checkEmail(email, "email");
+        if (bio) bio = validator.checkString(bio, "bio");
       } catch (e) {
         return res.status(400).json({ error: e });
       }
@@ -70,6 +72,7 @@ export default async function handler(
           firstName,
           lastName,
           email,
+          bio,
         });
         delete result.password;
       } catch (e) {

@@ -82,11 +82,14 @@ export default function MyProfile({ username }: { username: any }) {
   function submitPersonal() {
     setLoadingPersonal(true);
     // get and validate user inputs
-    let firstName, lastName, email;
+    let firstName, lastName, email, bio;
     try {
       firstName = validator.checkName($("#firstName").val(), "first name");
       lastName = validator.checkName($("#lastName").val(), "last name");
       email = validator.checkEmail($("#email").val(), "email");
+      bio = $("#bio").val() as any;
+      if (bio.trim() !== "") bio = validator.checkString(bio, "bio");
+      else bio = undefined;
     } catch (e) {
       alert(e);
       setLoadingPersonal(false);
@@ -100,6 +103,7 @@ export default function MyProfile({ username }: { username: any }) {
         firstName,
         lastName,
         email,
+        bio,
       })
       .then((res) => {
         console.log(res);
@@ -223,6 +227,8 @@ export default function MyProfile({ username }: { username: any }) {
                   />
                   <label htmlFor="email">Email</label>
                   <input type="email" id="email" defaultValue={data.email} />
+                  <label htmlFor="bio">Bio</label>
+                  <textarea id="bio" defaultValue={data.bio} />
                   <label htmlFor="submitInfo">Save Personal Information</label>
                   <input
                     id="submitInfo"

@@ -54,7 +54,7 @@ const methods = {
       "user"
     )) as User;
     let comparison = await bcrypt.compare(password, user.password);
-    if (!comparison) throw "invalid password";
+    if (!comparison) throw "Invalid credentials.";
 
     delete user.password;
     return user;
@@ -181,7 +181,7 @@ const methods = {
     }
 
     // validate bio
-    if (fields.hasOwnProperty("bio")) {
+    if (fields.hasOwnProperty("bio") && fields.bio !== undefined) {
       new_user.bio = validator.checkString(fields.bio);
     }
 
