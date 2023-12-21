@@ -9,7 +9,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) {
-  if (process.env.ALLOW_SEED === "false")
+  if (process.env.ALLOW_SEED !== "true")
     return res
       .status(403)
       .json({ error: "Seeding is not allowed on this server." });

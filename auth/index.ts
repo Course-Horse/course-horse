@@ -4,8 +4,8 @@ import { userData } from "@/data";
 const exportedMethods = {
   async getSession(context: any) {
     const session = await getIronSession(context.req, context.res, {
-      password: "TFj9LX2JJKBHMdiam9N9eUryQNxD72Lh",
-      cookieName: "special-cookie",
+      password: process.env.SESSION_PASSWORD as any,
+      cookieName: process.env.COOKIE_NAME as any,
     });
 
     return session;

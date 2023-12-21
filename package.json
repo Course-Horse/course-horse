@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "echo SEE README.md for instructions on how to seed the database",
+    "docker": "docker-compose up"
   },
   "dependencies": {
     "axios": "^1.6.2",

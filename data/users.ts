@@ -626,6 +626,30 @@ const methods = {
 
     return sortedTags;
   },
+
+  async setAdmin(username: string, admin: boolean): Promise<any> {
+    // validate username
+    username = validator.checkUsername(username, "username");
+
+    // retrieve user to change application status of
+    let user = (await mongo.getDocByParam(
+      users,
+      "username",
+      username,
+      "user"
+    )) as User;
+
+    // update user's application status and update the database
+    user.admin = admin;
+    let result = (await mongo.replaceDocById(
+      users,
+      user._id.toString(),
+      user,
+      "user"
+    )) as User;
+    delete result.password;
+    return result;
+  },
 };
 
 export default methods;

@@ -135,6 +135,16 @@ export default function CreateLesson({ username }: { username: any }) {
             addButtonText="Add Video Link"
             removeButtonText="Remove"
           />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              alert(
+                "Video links must be formatted as https://www.youtube.com/embed/VIDEO_ID"
+              );
+            }}
+          >
+            How to Add Videos
+          </button>
           <div className={createLessonStyles.quizSection}>
             <h2>Quiz</h2>
             <div
