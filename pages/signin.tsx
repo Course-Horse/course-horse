@@ -36,12 +36,8 @@ export default function Signin({ username }: { username: any }) {
         console.log(res);
         window.location.href = "/profile";
       })
-      .catch((err) => {
-        utils.alertError(
-          alert,
-          err,
-          "There was an error signing in. Please try again."
-        );
+      .catch((_err) => {
+        utils.alertError(alert, "", "Username or Passowrd is incorrect");
         setLoading(false);
       });
   }
