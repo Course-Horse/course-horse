@@ -45,6 +45,15 @@ export default function MyProfile({ username }: { username: any }) {
             <h1>{thisUsername}</h1>
             <p>{data.email}</p>
             <p>{`${data.firstName} ${data.lastName}`}</p>
+            <p>{data.bio}</p>
+            {data.application && data.application.status === "accepted" && (
+              <>
+                <h2>Educator Documents</h2>
+                {data.application.documents.map((doc: any, index: number) => {
+                  return <a href={doc}>Document {index + 1}</a>;
+                })}
+              </>
+            )}
           </div>
         )}
       </main>

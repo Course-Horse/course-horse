@@ -78,6 +78,7 @@ export default function AdminView({ username }: { username: any }) {
                     {data.firstName} {data.lastName}
                   </p>
                   <p>{data.email}</p>
+                  <p>{data.bio}</p>
                 </div>
 
                 {!data.application ? (

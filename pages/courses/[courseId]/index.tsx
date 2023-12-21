@@ -14,11 +14,13 @@ function LessonPreview({
   num,
   data,
   username,
+  creator,
 }: {
   courseId: any;
   num: number;
   data: any;
   username: string;
+  creator: string;
 }) {
   console.log(username);
 
@@ -27,7 +29,7 @@ function LessonPreview({
       <h3>
         Lesson {num + 1}: {data.title}
       </h3>
-      {data.creator !== username ? null : (
+      {creator === username ? null : (
         <p style={{ margin: "0px" }}>
           {data.viewed.includes(username) &&
           (data.quiz === null || data.quiz.completed.includes(username))
@@ -197,6 +199,7 @@ export default function Course({ username }: { username: any }) {
                         num={index}
                         data={lesson}
                         username={username}
+                        creator={data.creator}
                       />
                     );
                   })
