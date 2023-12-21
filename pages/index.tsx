@@ -18,7 +18,7 @@ export default function Home({ username }: { username: any }) {
         <div className={styles.header}>
           <Image src="/logo.png" alt="Course Horse Logo" />
           <h1>Course Horse</h1>
-          <p>Your all-in-one online learning platform.</p>
+          <p>Your all-in-one horse based learning alternative.</p>
         </div>
         <div className={styles.section}>
           <div>

@@ -11,7 +11,7 @@ import NavBar from "@/components/navbar/navbar";
 import { Spinner } from "react-bootstrap";
 import utils from "@/utils";
 
-const TAGS = ["Math", "Science", "English", "History", "Art", "Music", "Other"];
+const TAGS = validator.TAGS;
 
 export default function EditCourse({ username }: { username: any }) {
   const { courseId } = useParams();

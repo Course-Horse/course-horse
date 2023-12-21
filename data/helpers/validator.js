@@ -226,6 +226,8 @@ const exportedMethods = {
     for (let i in tags) {
       tags[i] = this.checkTag(tags[i], varName);
     }
+    if(tags.length === 0)
+      throw "Must have atleast one tag"
     return tags;
   },
 };
