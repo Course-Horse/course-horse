@@ -50,7 +50,11 @@ export default function MyProfile({ username }: { username: any }) {
               <>
                 <h2>Educator Documents</h2>
                 {data.application.documents.map((doc: any, index: number) => {
-                  return <a href={doc}>Document {index + 1}</a>;
+                  return (
+                    <a href={doc} key={index}>
+                      Document {index + 1}
+                    </a>
+                  );
                 })}
               </>
             )}
