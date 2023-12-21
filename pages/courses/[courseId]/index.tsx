@@ -129,7 +129,7 @@ export default function Course({ username }: { username: any }) {
           <>
             <div className={headerStyle.header}>
               <div>
-                <img src={data.coursePicture} />
+                <img alt="Course Picture" src={data.coursePicture} />
                 <Link href={`/courses/`}>Back to Courses</Link>
               </div>
 

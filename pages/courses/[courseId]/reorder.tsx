@@ -103,7 +103,7 @@ export default function Reorder({ username }: { username: any }) {
             <div className={styles.reorder}>
               {data.map((lesson: any, index: number) => {
                 return (
-                  <div>
+                  <div key={index}>
                     <h3>Lesson {index + 1}</h3>
                     <div>
                       <div>

@@ -97,7 +97,7 @@ export default function Lesson({ username }: { username: string }) {
           <>
             <div className={headerStyles.header}>
               <div>
-                <img src={data.coursePicture} />
+                <img src={data.coursePicture} alt="Course Picture" />
                 <Link href={`/courses/${courseId}`}>Back to Course</Link>
               </div>
 

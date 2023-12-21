@@ -125,7 +125,10 @@ export default function Admin({ username }: { username: any }) {
                             : "#ffb7a3",
                       }}
                     >
-                      <img src={application.profilePicture} />
+                      <img
+                        src={application.profilePicture}
+                        alt="Profile Picture"
+                      ></img>
                       <div>
                         <p>
                           {application.username} |{" "}

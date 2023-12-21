@@ -178,8 +178,8 @@ export default function CreateLesson({ username }: { username: any }) {
                         min={1}
                       />
                       <p>
-                        Tip: Correct answer corresponds to which # answer you're
-                        referring to.
+                        Tip: Correct answer corresponds to which # answer
+                        you&apos;re referring to.
                       </p>
                     </div>
                   </div>
