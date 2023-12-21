@@ -31,6 +31,9 @@ export default function Courses({ username }: { username: any }) {
         tagList.push(tag.value);
       }
     }
+    if (tagList.length === 0) {
+      tagList = validator.TAGS;
+    }
     // validate inputs
     try {
       // title = validator.checkString(title, "title"); ignore title

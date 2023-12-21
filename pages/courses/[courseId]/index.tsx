@@ -13,16 +13,27 @@ function LessonPreview({
   courseId,
   num,
   data,
+  username,
 }: {
   courseId: any;
   num: number;
   data: any;
+  username: string;
 }) {
   return (
     <div>
       <h3>
         Lesson {num + 1}: {data.title}
       </h3>
+      {data.creator !== username && (
+        <p style={{ margin: "0px" }}>
+          {data.viewed.includes(username) &&
+          (data.quiz === null || data.quiz.completed.includes(username))
+            ? "✅ Completed"
+            : "❌ Incomplete"}
+        </p>
+      )}
+
       <p>{data.description}</p>
       <div>
         <Button href={`/courses/${courseId}/${num}`}>
@@ -153,14 +164,22 @@ export default function Course({ username }: { username: any }) {
               {data.completed ? <p>✅ Completed!</p> : null}
             </div>
             <div className={styles.lessonList}>
-              <h2>
-                Lessons{" "}
+              <section>
+                <h2>Lessons </h2>
                 {data.creator !== username ? null : (
-                  <Button href={`/courses/${courseId}/create`}>
-                    Create Lesson
-                  </Button>
+                  <div>
+                    <Button href={`/courses/${courseId}/create`}>
+                      Create Lesson
+                    </Button>
+                    <Button
+                      href={`/courses/${courseId}/reorder`}
+                      variant="secondary"
+                    >
+                      Reorder Lessons
+                    </Button>
+                  </div>
                 )}
-              </h2>
+              </section>
 
               <div>
                 {data.lessons === undefined ? (
@@ -175,6 +194,7 @@ export default function Course({ username }: { username: any }) {
                         courseId={courseId}
                         num={index}
                         data={lesson}
+                        username={username}
                       />
                     );
                   })

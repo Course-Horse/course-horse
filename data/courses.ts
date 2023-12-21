@@ -2,6 +2,7 @@ import { courses, users } from "@/config/mongoCollections.js";
 import { mongo, validator } from "@/data/helpers/index.ts";
 import { Course, User, CourseUpdate } from "@/types";
 import { lessonData, userData } from "@/data";
+import { ObjectId } from "mongodb";
 
 const methods = {
   /**
@@ -236,15 +237,15 @@ const methods = {
       throw "lessons must contain the same lesson IDs as the provided course";
     }
     for (const lessonId of new_course.lessons) {
-      if (!lessons.includes(lessonId)) {
-        throw new Error(
-          "lessons must contain the same lesson IDs as the provided course"
-        );
+      if (!lessons.includes(lessonId.toString())) {
+        throw "lessons must contain the same lesson IDs as the provided course";
       }
     }
 
     // update course's lessons
-    new_course.lessons = lessons;
+    new_course.lessons = lessons.map((lesson) => {
+      return new ObjectId(lesson);
+    }) as any;
 
     // update course in database using mongo helper functions
     let result = (await mongo.replaceDocById(
