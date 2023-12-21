@@ -53,8 +53,11 @@ export default function AdminView({ username }: { username: any }) {
   return (
     <>
       <Head>
-        <title>Admin | Course Horse</title>
-        <meta name="description" content="Admin page for Course Horse." />
+        <title>Application | Course Horse</title>
+        <meta
+          name="description"
+          content="View an application on Course Horse."
+        />
       </Head>
       <NavBar username={username} />
       <main className="pageContainer">

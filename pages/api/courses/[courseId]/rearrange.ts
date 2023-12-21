@@ -14,45 +14,58 @@ export default async function handler(
     return res
       .status(401)
       .json({ error: "You must be signed in to rearrange lessons" });
+
+  // get user data
   let user;
   try {
     user = (await userData.getUser(session.username)) as User;
   } catch (e) {
     return res.status(404).json({ error: "User not found." });
   }
-
-  // get and validate course id
-  let course;
+  // validate course id
+  let courseId = req.query.courseId as string;
   try {
-    let courseId = req.query.courseId as string;
-    courseId = mongo.checkId(courseId);
-    course = (await courseData.getCourse(courseId)) as Course;
+    courseId = mongo.checkId(courseId, "courseId");
   } catch (e) {
     return res.status(400).json({ error: "Invalid course ID." });
   }
-
+  // get course
+  let course;
+  try {
+    course = (await courseData.getCourse(courseId)) as Course;
+  } catch (e) {
+    return res.status(404).json({ error: "course not found" });
+  }
   const method = req.method;
   // rearrange lessons for a specific course
   if (method === "POST") {
-    // validate lessons
+    // validate lesson ids
     let { lessons } = req.body;
-    lessons = validator.checkStringArray(lessons, "lessons");
-
+    for (let i = 0; i < lessons.length; i++) {
+      try {
+        lessons[i] = mongo.checkId(lessons[i], "lesson id");
+      } catch (e) {
+        return res.status(400).json({ error: e });
+      }
+    }
     // check if current session's user is the creator of the course or an admin
     if (session.username !== course.creator && !user.admin) {
-      throw "must be course creator or admin to rearrange lessons";
+      return res.status(403).json({
+        error: "You must be the creator of the course to rearrange the lessons",
+      });
     }
-
-    // make call to backend
+    // rearrange lessons
+    let result;
     try {
-      let result = await courseData.rearrangeLessons(
+      result = await courseData.rearrangeLessons(
         course._id.toString(),
         lessons
       );
-      return res.status(200).json({ course: result });
     } catch (e) {
       return res.status(500).json({ error: e });
     }
+
+    return res.status(200).json({ course: result });
   }
 
   return res

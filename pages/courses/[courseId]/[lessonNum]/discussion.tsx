@@ -83,7 +83,9 @@ export default function Discussion({ username }: { username: any }) {
                       return (
                         <div key={index} className={styles.message}>
                           <div>
-                            <p>{message.username}</p>
+                            <a href={`/profile/${message.username}`}>
+                              {message.username}
+                            </a>
                             <p>{new Date(message.created).toString()}</p>
                           </div>
                           <p>{message.message}</p>
