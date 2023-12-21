@@ -1,6 +1,28 @@
 import {userData, courseData, lessonData} from '@/data';
+import { MongoClient } from "mongodb";
 
 async function seeding(){
+    
+    const mongoConfig = {
+        serverUrl: process.env.MONGO_ADDRESS,
+        database: process.env.MONGO_DATABASE,
+    };
+    
+    let _connection = undefined as any;
+    let _db = undefined as any;
+    
+    const dbConnection = async () => {
+        if (!_connection) {
+            _connection = await MongoClient.connect(mongoConfig.serverUrl as any);
+            _db = await _connection.db(mongoConfig.database);
+        }
+        
+        return _db;
+    };
+
+    const db = await dbConnection() as any
+    await db.dropDatabase();
+
     await userData.createUser(
         "tylerlane603",
         "Tyler603!",
